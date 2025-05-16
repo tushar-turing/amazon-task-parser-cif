@@ -3,33 +3,44 @@ import nbformat
 import os
 import sys
 import glob
+import re
+from collections import defaultdict
 
 def get_cell_text(cell):
     """Safely join multiline or string cell contents."""
     return ''.join(cell['source']) if isinstance(cell['source'], list) else cell['source']
 
-def is_user_cell(cell):
-    """Check if the cell is a user cell."""
-    return cell['cell_type'] == 'markdown' and '**[user]**' in get_cell_text(cell)
+def detect_tag(cell_text):
+    """Detect tag and return tag type and optional model tag."""
+    match = re.match(r"\*\*\[(.*?)\]\*\*", cell_text.strip())
+    if not match:
+        return None, None
 
-def is_assistant_cell(cell):
-    """Check if the cell is an assistant cell."""
-    return cell['cell_type'] == 'markdown' and '**[assistant]**' in get_cell_text(cell)
-
-def is_metadata_cell(cell):
-    """Check if the cell is a metadata cell."""
-    return cell['cell_type'] == 'markdown' and '**[turn_metadata]**' in get_cell_text(cell)
+    tag = match.group(1)
+    if tag == "user":
+        return "user", None
+    elif tag == "turn_metadata":
+        return "metadata", None
+    elif tag == "assistant":
+        return "assistant", None
+    elif tag.startswith("assistant_"):
+        return "assistant_model", tag.split("_", 1)[1]
+    else:
+        return None, None
 
 def extract_json_from_metadata_cell(source_text):
     try:
-        start = source_text.find("```")
-        end = source_text.rfind("```")
-        if start == -1 or end == -1 or start == end:
+        match = re.search(r"```(?:json)?\n(.*?)```", source_text, re.DOTALL)
+        if not match:
             return {}
-        json_str = source_text[start+3:end].strip()
+        json_str = match.group(1).strip()
         return json.loads(json_str)
     except json.JSONDecodeError as e:
-        print("JSON decode error:", e)
+        print("JSON decode error:")
+        print(f"Parse error on line {e.lineno}:")
+        print(e.doc.splitlines()[e.lineno-1])
+        print(" " * e.colno + "^")
+        print(f"Expecting {e.msg}")
         return {}
 
 def process_notebook(file_path, dialogue_id=None):
@@ -37,34 +48,51 @@ def process_notebook(file_path, dialogue_id=None):
         nb = nbformat.read(f, as_version=4)
 
     turns = []
-    cells = nb['cells']
-    i = 0
+    current_turn = {}
+    assistant_models = {}
 
-    while i < len(cells) - 2:
-        user_cell = cells[i]
-        metadata_cell = cells[i + 1]    
-        assistant_cell = cells[i + 2]
+    for cell in nb['cells']:
+        if cell['cell_type'] != 'markdown':
+            continue
 
-        if is_user_cell(user_cell) and is_assistant_cell(assistant_cell) and is_metadata_cell(metadata_cell):
-            prompt = get_cell_text(user_cell).replace('**[user]**', '').strip()
-            response = get_cell_text(assistant_cell).replace('**[assistant]**', '').strip()
-            metadata_text = get_cell_text(metadata_cell)
-            instruction_data = extract_json_from_metadata_cell(metadata_text)
+        cell_text = get_cell_text(cell)
+        tag_type, model_tag = detect_tag(cell_text)
 
-            turns.append({
-                "prompt": prompt,
-                "response": response,
-                "instructions": [
-                    {
-                        "instruction_id_list": instruction_data.get("instruction_id_list", []),
-                        "kwargs": instruction_data.get("kwargs", [])
-                    }
-                ]
-            })
+        if not tag_type:
+            continue
 
-            i += 3  # Advance to next triplet
-        else:
-            i += 1  # Skip malformed or extra cells
+        content = re.sub(r"\*\*\[.*?\]\*\*", "", cell_text).strip()
+
+        if tag_type == "user":
+            # If we already have a turn in progress, save it
+            if current_turn:
+                # Append any previously collected assistant_model responses
+                for k, v in assistant_models.items():
+                    current_turn[f"{k}_response"] = v
+                turns.append(current_turn)
+                current_turn = {}
+                assistant_models = {}
+
+            current_turn["prompt"] = content
+
+        elif tag_type == "metadata":
+            instruction_data = extract_json_from_metadata_cell(cell_text)
+            current_turn["instructions"] = [{
+                "instruction_id_list": instruction_data.get("instruction_id_list", []),
+                "kwargs": instruction_data.get("kwargs", [])
+            }]
+
+        elif tag_type == "assistant":
+            current_turn["response"] = content
+
+        elif tag_type == "assistant_model":
+            assistant_models[model_tag] = content
+
+    # Save last turn
+    if current_turn:
+        for k, v in assistant_models.items():
+            current_turn[f"{k}_response"] = v
+        turns.append(current_turn)
 
     return {
         "turns": turns,
@@ -73,6 +101,7 @@ def process_notebook(file_path, dialogue_id=None):
             "length": len(turns)
         }
     }
+
 
 
 

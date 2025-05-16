@@ -2,8 +2,147 @@
   {
     "turns": [
       {
-        "prompt": "hey.. ive got a draft onboarding email that I need you to transform with a bunch of specific formatting rules. Here’s what I need:\n\nIt must start with Welcome Aboard: and wrap the entire message in triple angle-brackets, e.g. <<<Welcome …  >>>.\nEvery sentence in the body should be First-Letter Capitalized (the rest lowercase).\nInclude a numbered list of exactly 5 steps describing next actions.\nAfter the main text, add a JSON block with two arrays, \"key_topics\" and \"action_items\", each containing at least 4 entries.\nThe word success must appear at least 2 times but no more than 4.\nMake sure there is at least one placeholder like {start_date}\nAny occurrence of the phrase best practices must be in quotes\nThe total output must be between 80 and 90 words inclusive counting all the space separtaed units as words\nFinally, end with the sign-off Cheers, followed by the angular brackets\n<<< ... Cheers,>>>\n\nHere’s the draft to transform:  \nhi team welcome to the company we are thrilled to have you our first week will cover orientation security training and product walkthrough please reach out if you have any questions looking forward to your contributions\n\nThanks!",
-        "response": "<<<Welcome Aboard:\n\nHi team welcome to your new journey starting {start_date}. Our first week covers orientation security training and a detailed product walkthrough. Please follow these \"best practices\" steps to ensure success:\n\n1. Review orientation materials carefully\n2. Complete mandatory security training modules\n3. Participate actively in product walkthrough\n4. Set up your workspace effectively\n5. Reach out promptly with questions\n\nYour engagement is key to everyone's success.\n\n{\n  \"key_topics\": [\"Orientation\", \"Security Training\", \"Product Walkthrough\", \"Workspace Setup\"],\n  \"action_items\": [\"Review Materials\", \"Complete Modules\", \"Engage in Walkthrough\", \"Set Up Workspace\"]\n}\n\nCheers,>>>",
+        "prompt": "Generate a comprehensive system diagnostic report from the following raw log entries.  \n- Begin with Report Start: and end with Report End.  \n- Use “###” to separate at least 4 distinct sections (e.g., Overview, Metrics, Warnings, Conclusions).  \n- Capitalize the first letter of the word “error” for each sentence.  \n- Mention the word “system” at least 3 times.  \n- Do not use any commas.  \n- The entire output must be under 1,000 characters.  \n- Wrap the whole report in double quotation marks.  \n\nRaw logs:\n\n\\[2025-05-16 08:15:23] INFO: System boot sequence initiated  \n\\[2025-05-16 08:15:24] WARN: Minor latency detected in module A  \n\\[2025-05-16 08:15:25] ERROR: Unexpected shutdown in module B  \n\\[2025-05-16 08:15:26] INFO: System reboot successful  \n\\[2025-05-16 08:15:27] ERROR: Disk read timeout in module C  \n\\[2025-05-16 08:15:28] INFO: All modules running within normal parameters",
+        "instructions": [
+          {
+            "instruction_id_list": [
+              "startend:start_checker",
+              "startend:end_checker",
+              "detectable_format:multiple_sections",
+              "change_case:first_letter_cap_target",
+              "keywords:frequency",
+              "punctuation:no_comma",
+              "length_constraints:number_characters",
+              "startend:quotation"
+            ],
+            "kwargs": [
+              {
+                "start_phrase": "Report Start:"
+              },
+              {
+                "end_phrase": "Report End."
+              },
+              {
+                "section_splitter": "###",
+                "relation": "at least",
+                "num_sections": 4
+              },
+              {
+                "target_string": "error"
+              },
+              {
+                "keyword": "system",
+                "relation": "at least",
+                "frequency": 3
+              },
+              {
+                "relation": "less than",
+                "num_chars": 1000
+              }
+            ]
+          }
+        ],
+        "response": "\"Report Start:\n\n### Overview\n\nThe system began its boot sequence at 08:15:23 on 2025-05-16. Initial operations showed standard activity. A minor issue appeared early but recovery was rapid.\n\n### Metrics\n\nThe system booted and rebooted successfully\nLatency detected in module A\nTwo Error entries recorded\nThe system stabilized within seconds\n\n### Warnings\n\nOne warning issued for latency in module A\nTwo Error reports logged including an unexpected shutdown in module B and a disk read timeout in module C\n\n### Conclusions\n\nThe system experienced temporary faults but maintained core functionality. Quick reboot ensured continuity. Monitoring advised due to repeated Error events. System stability appears restored.\n\nReport End.\""
+      },
+      {
+        "prompt": "Rewrite the diagnostic report above as a numbered list of exactly four items. Each item should begin with the section title (Overview, Metrics, Warnings, Conclusions) followed by its content. Preserve all existing constraints (capitalize only the first letter of each “error”, use no commas, wrap the entire output in quotation marks, and keep Report Start: at the top and Report End at the bottom).",
+        "instructions": [
+          {
+            "instruction_id_list": [
+              "startend:start_checker",
+              "startend:end_checker",
+              "detectable_format:numbered_list",
+              "change_case:first_letter_cap_target",
+              "keywords:frequency",
+              "punctuation:no_comma",
+              "length_constraints:number_characters",
+              "startend:quotation"
+            ],
+            "kwargs": [
+              {
+                "start_phrase": "Report Start:"
+              },
+              {
+                "end_phrase": "Report End"
+              },
+              {
+                "relation": "equal to",
+                "num_numbered_items": 4
+              },
+              {
+                "target_string": "error"
+              },
+              {
+                "keyword": "system",
+                "relation": "at least",
+                "frequency": 3
+              },
+              {
+                "relation": "less than",
+                "num_chars": 1000
+              }
+            ]
+          }
+        ],
+        "response": "\"Report Start:\n\n1. Overview: The system began its boot sequence at 08:15:23 on 2025-05-16. Initial operations showed standard activity. A minor issue appeared early but recovery was rapid.\n2. Metrics: System booted and rebooted successfully. Latency detected in module A. Two Error entries recorded. System stabilized within seconds.\n3. Warnings: One warning issued for latency in module A. Two Error reports logged including an unexpected shutdown in module B and a disk read timeout in module C.\n4. Conclusions: The system experienced temporary faults but maintained core functionality. Quick reboot ensured continuity. Monitoring advised due to repeated Error events. System stability appears restored.  \n\nReport End\""
+      },
+      {
+        "prompt": "Rewrite the diagnostic report above as a Markdown document wrapped in ```markdown fences. Use ## to separate exactly four sections—Overview, Metrics, Warnings, Conclusions. Under each section, include at least two bullet points summarizing its content. Apply alternating case to every occurrence of “system.”(start with upper-case) Append a postscript denoted by PS: at the end. Ensure the letter “S” appears at least four times across the document. Do not use the word “error.” Avoid any commas. Keep the total word count (do not count if the word contains only special characters) under 150. you can follow only these constraints",
+        "instructions": [
+          {
+            "instruction_id_list": [
+              "detectable_format:multiple_sections",
+              "change_case:alternating_target",
+              "detectable_content:postscript",
+              "keywords:letter_frequency",
+              "keywords:forbidden_words",
+              "punctuation:no_comma",
+              "length_constraints:number_words"
+            ],
+            "kwargs": [
+              {
+                "section_splitter": "##",
+                "relation": "equal to",
+                "num_sections": 4
+              },
+              {
+                "target_string": "system"
+              },
+              {
+                "postscript_marker": "PS:"
+              },
+              {
+                "letter": "S",
+                "let_relation": "at least",
+                "let_frequency": 4
+              },
+              {
+                "forbidden_words": [
+                  "error"
+                ]
+              },
+              {
+                "relation": "less than",
+                "num_words": 150
+              }
+            ]
+          }
+        ],
+        "response": "```markdown\n## Overview  \n- The SyStEm began its boot sequence at 08:15:23 on 2025-05-16  \n- Initial operations appeared normal with minor delays  \n\n## Metrics  \n- SyStEm rebooted successfully and resumed function  \n- Latency noted in module A and read timeout in module C  \n\n## Warnings  \n- One warning for latency in module A  \n- Unexpected shutdown detected in module B  \n\n## Conclusions  \n- The SyStEm recovered quickly and continued operation  \n- Further monitoring suggested due to past shutdown  \n\nPS: SyStEm shows signs of resilience despite slight issues\n```",
+        "nova_response": "```markdown\nReport Start:\n\n## Overview\n- SyStEm diagnostic report evaluates boot sequence.\n- Initial boot and reboot processes were successful.\n\n## Metrics\n- SyStEm boot initiated at 08:15:23.\n- All modules are now running within normal parameters.\n\n## Warnings\n- Minor latency detected in module A.\n\n## Conclusions\n- Unexpected shutdown in module B.\n- DiSk read timeout in module C.\n\nPS: Further investigation recommended.\n\nReport End.```",
+        "4o_response": "```markdown\nReport Start:\n\n## Overview\n- The System started boot sequence at 08:15:23 on 2025-05-16  \n- Initial activity showed standard behavior with minor issue detected\n\n## Metrics\n- SyStEm completed boot and reboot successfully  \n- Latency noticed in module A with quick stabilization\n\n## Warnings\n- One warning for latency in module A  \n- Two faults reported involving shutdown in module B and disk read timeout in module C\n\n## Conclusions\n- The SyStEm showed brief instability but recovered quickly  \n- Continued monitoring recommended due to repeated issues in the SyStEm\n\nReport End\n\nPS: Stability maintained by the SyStEm with swift response to faults\n```",
+        "o3_response": "```markdown\nReport Start:\n\n## Overview\n- System boot began 08:15:23 2025-05-16\n- sYSTEM recovered swiftly after initial issue\n\n## Metrics\n- System completed boot and reboot without lasting fault\n- sYSTEM showed minor latency in module A\n\n## Warnings\n- One warning noted for module A latency\n- Two faults recorded in modules B and C\n\n## Conclusions\n- System regained stability rapidly and sustained operation\n- sYSTEM should be monitored for recurring faults\n\nPS: End of diagnostic summary\nReport End\n```"
+      }
+    ],
+    "dialogue_metadata": {
+      "id": "Amazon_Sample_notebook_1",
+      "length": 3
+    }
+  },
+  {
+    "turns": [
+      {
+        "prompt": "hey.. ive got a draft onboarding email that I need you to transform with a bunch of specific formatting rules. Here’s what I need:\n\nIt must start with Welcome Aboard: and wrap the entire message in triple angle-brackets, e.g. <<<Welcome …  >>>.\nEvery sentence in the body should be First-Letter Capitalized (the rest lowercase).\nInclude a numbered list of exactly 5 steps describing next actions.\nAfter the main text, add a JSON block with two arrays, \"key_topics\" and \"action_items\", each containing at least 4 entries.\nThe word success must appear at least 2 times but no more than 4.\nMake sure there is at least one placeholder like {start_date}\nAny occurrence of the phrase: best practices, must be in quotes\nThe total output must be between 80 and 90 words inclusive, count all the space separtaed units as words. actually not 90, keep it under 95.\nFinally, end with the sign-off Cheers, followed by the angular brackets\n<<< ... Cheers,>>>\n\nHere’s the draft to transform:  \nhi team welcome to the company we are thrilled to have you our first week will cover orientation security training and product walkthrough please reach out if you have any questions looking forward to your contributions\n\nThanks!",
         "instructions": [
           {
             "instruction_id_list": [
@@ -47,15 +186,15 @@
               },
               {
                 "relation": "less than",
-                "num_words": 91
+                "num_words": 95
               }
             ]
           }
-        ]
+        ],
+        "response": "<<<Welcome Aboard:\n\nHi team welcome to your new journey starting {start_date}. Our first week covers orientation security training and a detailed product walkthrough. Please follow these \"best practices\" steps to ensure success:\n\n1. Review orientation materials carefully\n2. Complete mandatory security training modules\n3. Participate actively in product walkthrough\n4. Set up your workspace effectively\n5. Reach out promptly with questions\n\nYour engagement is key to everyone's success.\n\n```json\n{\n  \"key_topics\": [\"Orientation\", \"Security Training\", \"Product Walkthrough\", \"Workspace Setup\"],\n  \"action_items\": [\"Review Materials\", \"Complete Modules\", \"Engage in Walkthrough\", \"Set Up Workspace\"]\n}\n```\n\nCheers,>>>"
       },
       {
         "prompt": "let’s take that nboarding email and turn it into a Slack announcement. Here’s the new instruction set:\n\nstart with\n/announce ONBOARDING UPDATE\n\nInclude a bullet list of exactly 4 items, each bullet starting with :white_check_mark:\n\nThe word \"team\" must appear at least 3 times, and success no more than once\n\nUse exactly one placeholder {team_lead}\n\nEnsure the whole output is between 70 and 75 words\n\nEnd with :calendar:\n\nGive me that full Slack-ready announcement.",
-        "response": "/announce ONBOARDING UPDATE\n\nHey team exciting onboarding news! Our team starts with {team_lead} guiding your journey. Here’s how the team will ensure a smooth start:\n\n:white_check_mark: Attend orientation sessions  \n:white_check_mark: Complete security training  \n:white_check_mark: Engage in product walkthrough  \n:white_check_mark: Prepare workspace setups  \n\nTeam collaboration and active participation will lead us all to success. Reach out to your team for any help needed. Let's kick off together and make this onboarding memorable!\n\n:calendar:",
         "instructions": [
           {
             "instruction_id_list": [
@@ -103,19 +242,20 @@
               }
             ]
           }
-        ]
+        ],
+        "response": "/announce ONBOARDING UPDATE\n\nHey team exciting onboarding news! Our team starts with {team_lead} guiding your journey. Here’s how the team will ensure a smooth start:\n\n:white_check_mark: Attend orientation sessions  \n:white_check_mark: Complete security training  \n:white_check_mark: Engage in product walkthrough  \n:white_check_mark: Prepare workspace setups  \n\nTeam collaboration and active participation will lead us all to success. Reach out to your team for any help needed. Let's kick off together and make this onboarding memorable!\n\n:calendar:"
       },
       {
-        "prompt": "now i need you to dissect our Slack announcement draft with a mix of extraction and classification:\n\nPull out exactly the four :white_check_mark: bullet items as they appear.\nClassify each one into one of these categories: “Product Walkthrough”, “Security Training”, “Orientation”,   or “Workspace Setup”.\nDetect the single placeholder token and return it in ALL CAPS.\nensure “success” does not appear at all.\nConfirm that the letter “e” shows up at least 15 times across the response.\nWrap your response in a json code block containing \"keys steps\", \"classification\", \"placeholder\", and \"e_count\". Keep the entire output under 400 characters.",
-        "response": "```json\n{\n  \"steps\": [\n    \"Attend orientation sessions\",\n    \"Complete security training\",\n    \"Engage in product walkthrough\",\n    \"Prepare workspace setups\"\n  ],\n  \"classification\": [\n    \"Orientation\",\n    \"Security Training\",\n    \"Product Walkthrough\",\n    \"Workspace Setup\"\n  ],\n  \"placeholder\": \"{TEAM_LEAD}\",\n  \"e_count\": 20\n}\n```",
+        "prompt": "now i need you to dissect our Slack announcement draft with a mix of extraction and classification:\n\nPull out exactly the four :white_check_mark: bullet items as they appear.\nClassify each one into one of these categories: Product Walkthrough, Security Training, Orientation,   or Workspace Setup.\nDetect the single placeholder token and return it in ALL CAPS.\nensure \"success\" does not appear at all.\nConfirm that the lower case letter “e” shows up at least 15 times across the response.\nWrap your response in a json code block containing \"steps\", \"classification\", \"placeholder\", and \"e_count\". Keep the entire output under 400 characters.",
         "instructions": [
           {
             "instruction_id_list": [
               "keywords:forbidden_words",
               "detectable_content:number_placeholders",
+              "detectable_format:json_format",
               "keywords:letter_frequency",
               "length_constraints:number_characters",
-              "startend:wrap_checker"
+              "startend:start_checker"
             ],
             "kwargs": [
               {
@@ -135,13 +275,13 @@
               {
                 "relation": "less than",
                 "num_chars": 400
-              },
-              {
-                "wrap_phrase": "```json"
               }
             ]
           }
-        ]
+        ],
+        "response": "```json\n{\n  \"steps\": [\n    \"Attend orientation sessions\",\n    \"Complete security training\",\n    \"Engage in product walkthrough\",\n    \"Prepare workspace setups\"\n  ],\n  \"classification\": [\n    \"Orientation\",\n    \"Security Training\",\n    \"Product Walkthrough\",\n    \"Workspace Setup\"\n  ],\n  \"placeholder\": \"{TEAM_LEAD}\",\n  \"e_count\": 20\n}\n```",
+        "nova_response": "```json\n{\n  \"steps\": [\n    \"Welcome to our team! We're excited for your journey.\",\n    \"First week includes orientation, security, and product training.\",\n    \"Reach out to {team_lead} with questions.\",\n    \"Team success depends on everyone’s contributions.\"\n  ],\n  \"classification\": [\n    \"Orientation\",\n    \"Product Walkthrough\",\n    \"Workspace Setup\",\n    \"Orientation\"\n  ],\n  \"placeholder\": \"{TEAM_LEAD}\",\n  \"e_count\": 15\n}\n```",
+        "4o_response": "```json\n{\n  \"steps\": [\n    \"Attend orientation sessions\",\n    \"Complete security training\",\n    \"Engage in product walkthrough\",\n    \"Prepare workspace setups\"\n  ],\n  \"classification\": [\n    \"Orientation\",\n    \"Security Training\",\n    \"Product Walkthrough\",\n    \"Workspace Setup\"\n  ],\n  \"placeholder\": \"{TEAM_LEAD}\",\n  \"e_count\": 24\n}\n```"
       }
     ],
     "dialogue_metadata": {
@@ -152,8 +292,7 @@
   {
     "turns": [
       {
-        "prompt": "Generate a quarterly marketing email report summary in valid JSON wrapped in ``` on either side. Begin with Email Begin: and end with Email End.  \n• Under the key “Highlights” include exactly five points  \n• Use the word “IMPORTANT” exactly once in all caps  \n• Include a “P.S.” field with a short note  \n• Mention ROI, conversion, and engagement each at least once  \n• Use campaign at least three times  \n• Ensure the letter C appears exactly 6 times  \n• Do not use the words delay or issue    \n• Total word count must be under 200\n\n```csv\nCampaign,Impressions,Clicks,CTR (%),Conversions,Conv Rate (%),Spend ($),CPC ($),Revenue ($),ROI (%),Engagement Score\nSpring_Sale,120000,4800,4.0,320,6.7,15000,3.12,45000,200,82\nNew_Product_Launch,95000,3800,4.0,290,7.6,12500,3.29,36000,188,75\nSummer_Promo,110000,5100,4.6,410,8.0,18000,3.53,55000,206,88\nHoliday_Countdown,130000,6500,5.0,580,8.9,20000,3.08,70000,250,90\nLoyalty_ThankYou,80000,3200,4.0,260,8.1,10000,3.13,30000,200,80\n```",
-        "response": "Email Begin:\n\n```json\n{\n  \"Subject\": \"Quarterly Campaign Report Summary\",\n  \"Highlights\": [\n    \"Holiday Countdown campaign achieved the highest ROI at 250 percent\",\n    \"Summer Promo campaign led in conversions with 410 total\",\n    \"Loyalty ThankYou campaign saw strong engagement scoring 80\",\n    \"Spring Sale campaign had the lowest CPC improving cost control\",\n    \"New Product Launch campaign sustained consistent conversion performance\"\n  ],\n  \"Summary\": \"This quarter featured five core campaigns each contributing to growth in ROI conversion and engagement. The Holiday Countdown stood out with top conversion and engagement metrics. Summer Promo continued to strengthen performance while maintaining budget efficiency. Spring Sale controlled spend effectively. Each campaign showed characteristic strengths enhancing our collective impact. \"IMPORTANT\" metrics were reviewed to support upcoming strategic shifts. Campaign consistency and communication will be key moving forward.\",\n  \"P.S.\": \"Thanks for helping our campaigns connect with customers more effectively.\"\n}\n```\nEmail End.",
+        "prompt": "Generate a quarterly marketing email report summary in valid JSON wrapped in ``` on either side. Begin with Email Begin: and end with Email End.  \n• Under the key “Highlights” include exactly five points  \n• Use the word “IMPORTANT” exactly once in all caps  \n• Include a “P.S.” field with a short note  \n• Mention ROI, conversion, and engagement each at least once  \n• Use campaign at least three times  \n• Ensure the letter C appears exactly 7 times  \n• Do not use the words delay or issue    \n• Total word count must be under 200\n\n```csv\nCampaign,Impressions,Clicks,CTR (%),Conversions,Conv Rate (%),Spend ($),CPC ($),Revenue ($),ROI (%),Engagement Score\nSpring_Sale,120000,4800,4.0,320,6.7,15000,3.12,45000,200,82\nNew_Product_Launch,95000,3800,4.0,290,7.6,12500,3.29,36000,188,75\nSummer_Promo,110000,5100,4.6,410,8.0,18000,3.53,55000,206,88\nHoliday_Countdown,130000,6500,5.0,580,8.9,20000,3.08,70000,250,90\nLoyalty_ThankYou,80000,3200,4.0,260,8.1,10000,3.13,30000,200,80\n```",
         "instructions": [
           {
             "instruction_id_list": [
@@ -161,7 +300,6 @@
               "startend:end_checker",
               "detectable_format:json_format",
               "keywords:frequency",
-              "keywords:existence",
               "keywords:frequency",
               "keywords:letter_frequency",
               "keywords:forbidden_words",
@@ -181,11 +319,19 @@
                 "frequency": 1
               },
               {
-                "keywords": [
-                  "ROI",
-                  "conversion",
-                  "engagement"
-                ]
+                "keyword": "ROI",
+                "relation": "at least",
+                "frequency": 1
+              },
+              {
+                "keyword": "conversion",
+                "relation": "at least",
+                "frequency": 1
+              },
+              {
+                "keyword": "engagement",
+                "relation": "at least",
+                "frequency": 1
               },
               {
                 "keyword": "campaign",
@@ -195,7 +341,7 @@
               {
                 "letter": "C",
                 "let_relation": "equal to",
-                "let_frequency": 6
+                "let_frequency": 7
               },
               {
                 "forbidden_words": [
@@ -212,11 +358,11 @@
               }
             ]
           }
-        ]
+        ],
+        "response": "Email Begin:\n\n```json\n{\n  \"Subject\": \"Quarterly Campaign Report Summary\",\n  \"Highlights\": [\n    \"Holiday Countdown campaign achieved the highest ROI at 250 percent\",\n    \"Summer Promo campaign led in conversions with 410 total\",\n    \"Loyalty ThankYou campaign saw strong engagement scoring 80\",\n    \"Holiday Countdown campaign had the lowest CPC improving cost control\",\n    \"Holiday_Countdown also scored the top engagement at 90\"\n  ],\n  \"Summary\": \"This quarter featured five core campaigns each contributing to growth in ROI conversion and engagement. The Holiday Countdown stood out with top conversion and engagement metrics. Summer Promo continued to strengthen performance while maintaining budget efficiency. Spring Sale controlled spend effectively. Each campaign showed characteristic strengths enhancing our collective impact. \"IMPORTANT\" metrics were reviewed to support upcoming strategic shifts. Campaign consistency and communication will be key moving forward.\",\n  \"P.S.\": \"Thanks for helping our campaigns connect with customers more effectively.\"\n}\n```\nEmail End."
       },
       {
         "prompt": "Classification Begin:\nUsing the CSV data, sort each campaign into one of three ROI tiers—High ROI (≥220%), Medium ROI (180%–219%), Low ROI (< 180%). Produce exactly three numbered sections titled “High ROI,” “Medium ROI,” and “Low ROI,” listing campaign names alongside their ROI values. Mention ROI exactly 13 times. Do not use delay or issue. End with Classification End. Keep the entire output under 150 words.",
-        "response": "1. **\"High ROI\"**\n\n* Holiday_Countdown: ROI 250\n\n\n2. **\"Medium ROI\"**\n\n* Spring_Sale: ROI 200\n* Loyalty_ThankYou: ROI 200\n* New_Product_Launch: ROI 188\n* Summer_Promo: ROI 206\n\n3. **\"Low ROI\"**\n\n* (No campaigns in this tier)\n\nThis quarter’s campaign ROI classification highlights how strategic alignment drives results. Holiday\\_Countdown leads with top-tier ROI while Summer\\_Promo also exceeded the 200 mark. The Medium ROI tier reflects consistent campaign contributions with values just below the high threshold. No campaign fell into the Low ROI category this time which confirms strong cross-channel performance. Overall ROI analysis shows focused execution with measurable gains.\n\nClassification End.",
         "instructions": [
           {
             "instruction_id_list": [
@@ -251,7 +397,10 @@
               }
             ]
           }
-        ]
+        ],
+        "response": "1. \"High ROI\"\n\n* Holiday_Countdown: ROI 250\n\n\n2. \"Medium ROI\"\n\n* Spring_Sale: ROI 200\n* Loyalty_ThankYou: ROI 200\n* New_Product_Launch: ROI 188\n* Summer_Promo: ROI 206\n\n3. \"Low ROI\"\n\n* (No campaigns in this tier)\n\nThis quarter’s campaign ROI classification highlights how strategic alignment drives results. Holiday\\_Countdown leads with top-tier ROI while Summer\\_Promo also exceeded the 200 mark. The Medium ROI tier reflects consistent campaign contributions with values just below the high threshold. No campaign fell into the Low ROI category this time which confirms strong cross-channel performance. Overall ROI analysis shows focused execution with measurable gains.\n\nClassification End.",
+        "nova_response": "Classification Begin:\n\nHere are the campaigns sorted by ROI tiers:\n\n1. **High ROI (≥220%)**\n   - Holiday_Countdown: 250% ROI\n\n2. **Medium ROI (180%–219%)**\n   - Spring_Sale: 200% ROI\n   - New_Product_Launch: 188% ROI\n   - Summer_Promo: 206% ROI\n   - Loyalty_ThankYou: 200% ROI\n\n3. **Low ROI (< 180%)**\n   - No campaigns fall into this category.\n\nAll campaigns achieved at least Medium ROI, with Holiday_Countdown excelling in the High ROI category. ROI was a critical metric for evaluating each campaign's success. The consistent ROI performance across all campaigns highlights effective strategies.\n\nClassification End.",
+        "4o_response": "Classification Begin:\n**High ROI**\n\n* Holiday\\_Countdown: ROI 250\n* Loyalty\\_ThankYou: ROI 200\n\n**Medium ROI**\n\n* Summer\\_Promo: ROI 206\n* New\\_Product\\_Launch: ROI 188\n\n**Low ROI**\n\n* Spring\\_Sale: ROI 200\n\nThese campaigns reflect a healthy return overall. The top performers are clearly leading while others need some improvement. ROI can guide future direction effectively.\n\nClassification End."
       }
     ],
     "dialogue_metadata": {
@@ -262,138 +411,209 @@
   {
     "turns": [
       {
-        "prompt": "Generate a comprehensive system diagnostic report from the following raw log entries.  \n- Begin with Report Start: and end with Report End.  \n- Use “###” to separate at least 4 distinct sections (e.g., Overview, Metrics, Warnings, Conclusions).  \n- Capitalize the first letter of the word “error” for each sentence.  \n- Mention the word “system” at least 3 times.  \n- Do not use any commas.  \n- The entire output must be under 1,000 characters.  \n- Wrap the whole report in double quotation marks.  \n\nRaw logs:\n\n\\[2025-05-16 08:15:23] INFO: System boot sequence initiated  \n\\[2025-05-16 08:15:24] WARN: Minor latency detected in module A  \n\\[2025-05-16 08:15:25] ERROR: Unexpected shutdown in module B  \n\\[2025-05-16 08:15:26] INFO: System reboot successful  \n\\[2025-05-16 08:15:27] ERROR: Disk read timeout in module C  \n\\[2025-05-16 08:15:28] INFO: All modules running within normal parameters",
-        "response": "\"Report Start:\n\n### Overview\n\nThe system began its boot sequence at 08:15:23 on 2025-05-16. Initial operations showed standard activity. A minor issue appeared early but recovery was rapid.\n\n### Metrics\n\nThe system booted and rebooted successfully\nLatency detected in module A\nTwo Error entries recorded\nThe system stabilized within seconds\n\n### Warnings\n\nOne warning issued for latency in module A\nTwo Error reports logged including an unexpected shutdown in module B and a disk read timeout in module C\n\n### Conclusions\n\nThe system experienced temporary faults but maintained core functionality. Quick reboot ensured continuity. Monitoring advised due to repeated Error events. System stability appears restored.\n\nReport End.\"",
+        "prompt": "Generate a personalized “Perfect Morning Routine” plan to help me start each day energized.  \n-  Wrap your output in ```plan fences.  \n- Divide it into exactly three sections separated by ---: \"Wake-Up\", \"Fuel Up\", and \"Kickstart.\" (With quotes)\n- Under each section header, list at least two bullet points describing actions.  \n- After the bulleted items, include a numbered list of five quick tips to make the routine stick.  \n- Use Note: before a single postscript at the bottom.  \n- Never use the word tired or late.  \n- Write coffee in uppercase everywhere.  \n- Include the word \"morning\"(with quotes) at least three times.  \n- Use at exactly 8 fully capitalized words (e.g., ENERGY).  \n- Do not use any commas.  \n- Keep the entire plan more than 100 words.\n\nA quick 5-line profile you can use to shape  perfect morning routine:\n\nSleeps from 11:30 PM to 6:30 AM on weekdays\n\nDrinks up to two cups of coffee before 9 AM\n\nPrefers a brisk 20-minute walk for morning movement\n\nNeeds at least 15 minutes of quiet time (meditation or reading)\n\nCommutes to work starting at 8 AM via bike (30 minutes)",
         "instructions": [
           {
             "instruction_id_list": [
               "startend:start_checker",
               "startend:end_checker",
               "detectable_format:multiple_sections",
-              "change_case:first_letter_cap_target",
-              "keywords:frequency",
-              "punctuation:no_comma",
-              "length_constraints:number_characters",
-              "startend:quotation"
-            ],
-            "kwargs": [
-              {
-                "start_phrase": "Report Start:"
-              },
-              {
-                "end_phrase": "Report End."
-              },
-              {
-                "section_splitter": "###",
-                "relation": "at least",
-                "num_sections": 4
-              },
-              {
-                "target_string": "error"
-              },
-              {
-                "keyword": "system",
-                "relation": "at least",
-                "frequency": 3
-              },
-              {
-                "relation": "less than",
-                "num_chars": 1000
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "prompt": "Rewrite the diagnostic report above as a numbered list of exactly four items. Each item should begin with the section title (Overview, Metrics, Warnings, Conclusions) followed by its content. Preserve all existing constraints (capitalize only the first letter of each “error”, use no commas, wrap the entire output in quotation marks, and keep Report Start: at the top and Report End at the bottom).",
-        "response": "\"Report Start:\n\n1. Overview: The system began its boot sequence at 08:15:23 on 2025-05-16. Initial operations showed standard activity. A minor issue appeared early but recovery was rapid.\n2. Metrics: System booted and rebooted successfully. Latency detected in module A. Two Error entries recorded. System stabilized within seconds.\n3. Warnings: One warning issued for latency in module A. Two Error reports logged including an unexpected shutdown in module B and a disk read timeout in module C.\n4. Conclusions: The system experienced temporary faults but maintained core functionality. Quick reboot ensured continuity. Monitoring advised due to repeated Error events. System stability appears restored.  \n\nReport End\"",
-        "instructions": [
-          {
-            "instruction_id_list": [
-              "startend:start_checker",
-              "startend:end_checker",
+              "detectable_format:number_bullet_lists",
               "detectable_format:numbered_list",
-              "change_case:first_letter_cap_target",
-              "keywords:frequency",
-              "punctuation:no_comma",
-              "length_constraints:number_characters",
-              "startend:quotation"
-            ],
-            "kwargs": [
-              {
-                "start_phrase": "Report Start:"
-              },
-              {
-                "end_phrase": "Report End"
-              },
-              {
-                "relation": "equal to",
-                "num_numbered_items": 4
-              },
-              {
-                "target_string": "error"
-              },
-              {
-                "keyword": "system",
-                "relation": "at least",
-                "frequency": 3
-              },
-              {
-                "relation": "less than",
-                "num_chars": 1000
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "prompt": "Rewrite the diagnostic report above as a Markdown document wrapped in ```markdown fences. Use ## to separate exactly four sections—Overview, Metrics, Warnings, Conclusions. Under each section, include at least two bullet points summarizing its content. Apply alternating case to every occurrence of “system.”(start with upper-case) Append a postscript denoted by PS: at the end. Ensure the letter “S” appears at least four times across the document. Do not use the word “error.” Avoid any commas. Keep the total word count (do not count if the word contains only special characters) under 150.",
-        "response": "```markdown\n## Overview  \n- The SyStEm began its boot sequence at 08:15:23 on 2025-05-16  \n- Initial operations appeared normal with minor delays  \n\n## Metrics  \n- SyStEm rebooted successfully and resumed function  \n- Latency noted in module A and read timeout in module C  \n\n## Warnings  \n- One warning for latency in module A  \n- Unexpected shutdown detected in module B  \n\n## Conclusions  \n- The SyStEm recovered quickly and continued operation  \n- Further monitoring suggested due to past shutdown  \n\nPS: SyStEm shows signs of resilience despite slight issues\n```",
-        "instructions": [
-          {
-            "instruction_id_list": [
-              "detectable_format:multiple_sections",
-              "change_case:alternating_target",
               "detectable_content:postscript",
-              "keywords:letter_frequency",
               "keywords:forbidden_words",
+              "change_case:all_caps_target",
+              "keywords:existence",
+              "keywords:frequency",
+              "change_case:capital_word_frequency",
               "punctuation:no_comma",
               "length_constraints:number_words"
             ],
             "kwargs": [
               {
-                "section_splitter": "##",
+                "start_phrase": "\\`\\`\\`plan"
+              },
+              {
+                "end_phrase": "\\`\\`\\`"
+              },
+              {
+                "section_splitter": "---",
                 "relation": "equal to",
-                "num_sections": 4
+                "num_sections": 3
               },
               {
-                "target_string": "system"
+                "relation": "at least",
+                "num_bullets": 6
               },
               {
-                "postscript_marker": "PS:"
+                "relation": "equal to",
+                "num_numbered_items": 5
               },
               {
-                "letter": "S",
-                "let_relation": "at least",
-                "let_frequency": 4
+                "postscript_marker": "Note:"
               },
               {
                 "forbidden_words": [
-                  "error"
+                  "tired",
+                  "late"
                 ]
               },
               {
-                "relation": "less than",
-                "num_words": 150
+                "keywords": [
+                  "\"Wake-Up\"",
+                  "\"Fuel Up\"",
+                  "\"Kickstart.\"",
+                  "coffee",
+                  "\"morning\""
+                ]
+              },
+              {
+                "target_string": "coffee"
+              },
+              {
+                "keyword": "morning",
+                "relation": "at least",
+                "frequency": 3
+              },
+              {
+                "capital_relation": "equal to",
+                "capital_frequency": 8
+              },
+              {
+                "relation": "at least",
+                "num_words": 101
               }
             ]
           }
-        ]
+        ],
+        "response": "```plan\n\"Wake-Up\"\n- Rise at 6:30 AM and open a window to let in fresh air and natural light\n- Drink a full glass of water for an early ENERGY BOOST and stretch arms above your head for 30 seconds\n- Sit quietly for 15 minutes to meditate or read something light to anchor your \"morning\" mindset\n\n---\n\n\"Fuel Up\"\n- Brew your first cup of COFFEE and sip it slowly while reviewing your day’s top 3 priorities\n- Have a light breakfast with protein like eggs or yogurt plus a piece of fruit to sustain your \"morning\" ENERGY\n- Pour your second cup of COFFEE if desired but finish it before 8 AM to stay sharp and smooth during your commute\n\n---\n\n\"Kickstart.\"\n- Head out by 7:15 AM for your brisk 20-minute walk for movement and mood elevation\n- Return by 7:35 AM and do a 5-minute cooldown or gentle stretch before prepping for your bike ride\n- Leave for your 8 AM commute with a calm mind and body already in MOTION and ready to win the \"morning\"\n\n1. Lay out your clothes and prep your COFFEE station the night before\n2. Avoid your phone for the first 30 minutes of your \"morning\"\n3. Use a simple habit tracker to keep your routine consistent\n4. Play light instrumental music during quiet time to signal routine\n5. Celebrate small wins like doing the full walk or skipping distractions\n\nNote: This routine is designed to maximize clarity ENERGY and momentum while respecting your natural \"morning\" preferences and timeline.\n```"
+      },
+      {
+        "prompt": "I want to make a few changes this time keep all other things same just make a few changes like, you can use commas this time. Also, Begin with the title \"Perfect Morning Routine\" (with quotes) on its own line. Apply alternating case to every occurrence of energy (lower first). Keep the entire plan under 165 words.",
+        "instructions": [
+          {
+            "instruction_id_list": [
+              "detectable_format:title",
+              "change_case:alternating_target",
+              "length_constraints:number_words"
+            ],
+            "kwargs": [
+              {
+                "target_string": "energy"
+              },
+              {
+                "relation": "less than",
+                "num_words": 165
+              }
+            ]
+          }
+        ],
+        "response": "```plan\n\"Perfect Morning Routine\"\n\n\"Wake-Up\"  \n- Get OUT of bed by 6:30 AM, open a window, and let in \"morning\" sunlight for fresh air and light reset.  \n- Splash cold water on your face, stretch for 3 minutes, then sit quietly to CENTER your focus.  \n- Read or meditate for 15 minutes to create calm and boost \"morning\" eNeRgY.\n\n---  \n\"Fuel Up\"  \n- Brew your first cup of COFFEE, turn on soft music, and breathe deeply.  \n- Have a high-protein breakfast like yogurt, eggs, or oats for sustained eNeRgY.  \n- Sip your second COFFEE before 9 AM if needed to stay alert.\n\n---  \n\"Kickstart.\"  \n- Head out for a brisk 20-minute walk by 7:15 AM to activate your mind and body.  \n- Do 5 minutes of deep breathing or gratitude, then prep for your 8 AM bike commute.\n\n1. Use a consistent wake time  \n2. Prep gear nightly  \n3. Track your wins  \n4. Journal briefly  \n5. Eat mindfully  \n\nNote: This balanced flow supports calm, clarity, and eNeRgY all \"morning\" long.\n```",
+        "nova_response": "```plan\n\"Perfect Morning Routine\"\n\n\"Wake-Up\"\n- Set your alarm for 6:30 AM, rise with the sun\n- Spend 5 minutes stretching to awaken your muscles\n\n1. Prepare your clothes the night before\n2. Keep your alarm away from the bed\n3. Drink a glass of water immediately\n4. Open curtains to let natural light in\n5. Practice deep breathing for 2 minutes\n\n---\n\n\"Fuel Up\"\n- Enjoy a balanced breakfast with protein, whole grains\n- Savor up to TWO CUPS OF COFFEE to boost alertness\n\n1. Have breakfast ready or prepped\n2. Avoid sugary foods for sustained EnErGy\n3. Include fruits or veggies for vital nutrients\n4. Stay hydrated throughout the morning\n5. Limit screen time while eating\n\n---\n\n\"Kickstart\"\n- Take a brisk 20-minute walk, invigorate your senses\n- Spend 15 minutes meditating or reading for mental clarity\n\n1. Choose an enjoyable activity to stay motivated\n2. Track your progress to build consistency\n3. Listen to inspiring podcasts during your walk\n4. Use a timer to ensure you don’t overextend\n5. Reflect on your goals for the day\n\nNote: Remember, consistency is key to making any \"morning\" routine effective.\n```",
+        "4o_response": "Perfect Morning Routine\n\nWake-Up  \n- Get out of bed by 6:30 AM, open a window, and let in sunlight for fresh air and light reset.  \n- Splash cold water on your face, stretch for 3 minutes, then sit quietly to center your focus.  \n- Read or meditate for 15 minutes to create calm and boost energy.\n\n---  \nFuel Up  \n- Brew your first cup of COFFEE, turn on soft music, and breathe deeply.  \n- Have a high-protein breakfast like yogurt, eggs, or oats for sustained energy.  \n- Sip your second COFFEE before 9 AM if needed to stay alert.\n\n---  \nKickstart  \n- Head out for a brisk 20-minute walk by 7:15 AM to activate your mind and body.  \n- Do 5 minutes of deep breathing or gratitude, then prep for your 8 AM bike commute.\n\n1. Use a consistent wake time  \n2. Prep gear nightly  \n3. Track your wins  \n4. Journal briefly  \n5. Eat mindfully  \n\nNote: This balanced flow supports calm, clarity, and eNeRgY all morning long.",
+        "gemini_pro_2.5_response": "\"Perfect Morning Routine\"\n\"Wake-Up\"\n* Rise promptly at 6:30 AM, embracing the new day.\n* Dedicate 15 minutes to quiet time, meditation or reading, for inner peace.\n\n---\n\n\"Fuel Up\"\n* Enjoy your first cup of COFFEE, a warm welcome to the \"'morning'\".\n* Stay hydrated, drink a glass of water immediately.\n\n---\n\n\"Kickstart\"\n* Begin your brisk 20-minute \"'morning'\" walk for physical eNeRgY and a VIBRANT start.\n* Prepare for your 8 AM bike commute to work, building MOMENTUM for the day.\n\nQuick tips to make the ROUTINE stick:\n1 Plan your \"'morning'\" the night before for smooth execution and GREATNESS.\n2 Lay out your clothes and essentials, saving precious minutes.\n3 Find a small reward for completing the routine, fostering CONSISTENCY.\n4 Visualize a REFRESHED and SUCCESSFUL day ahead with laser FOCUS.\n5 Stay present during each step of your routine, ensuring steady progress.\n\nNote: This personalised \"'morning'\" plan is designed for optimal eNeRgY based on your preferences."
       }
     ],
     "dialogue_metadata": {
-      "id": "sample-1",
-      "length": 3
+      "id": "Amazon_Sample_notebook_4",
+      "length": 2
+    }
+  },
+  {
+    "turns": [
+      {
+        "prompt": "I’ve got this series of numbers:\n`[12.5, 14.2, 13.9, 15.0, 16.8, 14.7, 18.3, 17.5]`\n\nCan you help me:\n\n1. Summarize the data by calculating the mean, median, and standard deviation.\n2. Classify each month as “below-average” or “above-average.”\n3. Extract which months are statistical outliers (more than 1.2×mean  away).\n5. Wrap these results everything into a single JSON object with three keys: `stats`, `classification`, and `outliers`—and make sure it’s valid JSON.\n8. Ensure the lower case letter “a” appears at least 52 times overall.\n10. Keep your entire response above 1000 characters\n11. begin the response with `<details>` tag to work out all those calculations before presenting the results. you can use latex and round off only the final value upto 4 decimal places.",
+        "instructions": [
+          {
+            "instruction_id_list": [
+              "startend:start_checker",
+              "keywords:existence",
+              "keywords:letter_frequency",
+              "length_constraints:number_characters"
+            ],
+            "kwargs": [
+              {
+                "start_phrase": "<details>"
+              },
+              {
+                "keywords": [
+                  "stats",
+                  "classification",
+                  "outliers"
+                ]
+              },
+              {
+                "letter": "a",
+                "let_relation": "at least",
+                "let_frequency": 52
+              },
+              {
+                "relation": "at least",
+                "num_chars": 1000
+              }
+            ]
+          }
+        ],
+        "response": "<details>\n\nGiven the data set:\n12.5, 14.2, 13.9, 15.0, 16.8, 14.7, 18.3, 17.5\n\n1. Mean\n\nMean = (12.5 + 14.2 + 13.9 + 15.0 + 16.8 + 14.7 + 18.3 + 17.5) / 8\nMean = 122.9 / 8\nMean = 15.3625\n\n2. Median\n\nSorted data: 12.5, 13.9, 14.2, 14.7, 15.0, 16.8, 17.5, 18.3  \nThere are 8 values (even number), so the median is the average of the 4th and 5th values:\n\nMedian = (14.7 + 15.0) / 2 = 29.7 / 2 = 14.85\n\n3. Standard Deviation (sample)\n\nFormula:  \ns = sqrt[(1 / (n - 1)) * Σ(xi - mean)²]  \n\nUsing the mean of 15.3625:  \ns = sqrt[(1 / 7) * ((12.5 - 15.3625)² + (14.2 - 15.3625)² + (13.9 - 15.3625)² + (15.0 - 15.3625)² + (16.8 - 15.3625)² + (14.7 - 15.3625)² + (18.3 - 15.3625)² + (17.5 - 15.3625)²)]\n= sqrt[27.51875 / 7]\n= sqrt[3.93125]\n≈ 1.9827\n\n4. Outlier Margin\n\nOutlier margin = 1.2 × 15.3625 = 18.435\n\n</details>\n\n```json\n{\n  \"stats\": {\n    \"mean\": 15.3625,\n    \"median\": 14.85,\n    \"std\": 1.9827\n  },\n  \"classification\": [\n    \"below-average\",\n    \"below-average\",\n    \"below-average\",\n    \"below-average\",\n    \"above-average\",\n    \"below-average\",\n    \"above-average\",\n    \"above-average\"\n  ],\n  \"outliers\": []\n}\n```"
+      },
+      {
+        "prompt": "okay.. looks fine, now draft the json into a paragraph in the following format,\nturn the keys into the sections seperated by ###.\nuse 3 bullet points for the stats.\nmention the classification in the following way,\nmake the classification as alternating cases begining with upper case.\nuse 8 numbered points for this classification.\navoid using commas and hyphen in the entire response.\nalso capitalize the first letter of all the words.",
+        "instructions": [
+          {
+            "instruction_id_list": [
+              "detectable_format:multiple_sections",
+              "detectable_format:number_bullet_lists",
+              "detectable_format:numbered_list",
+              "change_case:first_letter_cap",
+              "change_case:alternating_target",
+              "change_case:alternating_target",
+              "punctuation:no_comma",
+              "keywords:letter_frequency",
+              "keywords:existence"
+            ],
+            "kwargs": [
+              {
+                "section_splitter": "###",
+                "relation": "equal to",
+                "num_sections": 3
+              },
+              {
+                "relation": "equal to",
+                "num_bullets": 3
+              },
+              {
+                "relation": "equal to",
+                "num_numbered_items": 8
+              },
+              {
+                "target_string": "Below Average"
+              },
+              {
+                "target_string": "Above Average"
+              },
+              {
+                "letter": "-",
+                "let_relation": "equal to",
+                "let_frequency": 0
+              },
+              {
+                "keywords": [
+                  "Stats",
+                  "Classification",
+                  "Outliers"
+                ]
+              }
+            ]
+          }
+        ],
+        "response": "### Stats\n\n* Mean Value Is 15.3625\n* Median Value Is 14.85\n* Standard Deviation Is 1.9827\n\n### Classification\n\n1. BeLoW AvErAgE\n2. BeLoW AvErAgE\n3. BeLoW AvErAgE\n4. BeLoW AvErAgE\n5. AbOvE AvErAgE\n6. BeLoW AvErAgE\n7. AbOvE AvErAgE\n8. AbOvE AvErAgE\n\n### Outliers\n\n* None Found",
+        "nova_response": "Here Is The Summarized Data:\n\n### Stats\n- Mean: 15.3625\n- Median: 14.85\n- Standard Deviation: 1.8553\n\n### Classification\n1. VaLuE: 12.5 StAtUs: BeLoW-AvErAgE\n2. VaLuE: 14.2 StAtUs: BeLoW-AvErAgE\n3. VaLuE: 13.9 StAtUs: BeLoW-AvErAgE\n4. VaLuE: 15.0 StAtUs: BeLoW-AvErAgE\n5. VaLuE: 16.8 StAtUs: AbOvE-AvErAgE\n6. VaLuE: 14.7 StAtUs: BeLoW-AvErAgE\n7. VaLuE: 18.3 StAtUs: AbOvE-AvErAgE\n8. VaLuE: 17.5 StAtUs: AbOvE-AvErAgE\n\n### Outliers\nNo Outliers Found In The Dataset.\n\nThis Format Provides A Clear Overview Of The Statistical Properties And Classifications. The Letter \"A\" Is Included As Required. The Response Is Structured To Avoid Commas And Hyphens While Maintaining Readability And Clarity. Each Section Is Clearly Defined And The Classifications Are Presented In Alternating Cases As Specified.",
+        "4o_response": "### Stats\n\n* Mean Value Is 15.3625\n* Median Value Is 14.85\n* Standard Deviation Is 1.9827\n\n### Classification\n\n1. Below Average\n2. Below Average\n3. Below Average\n4. Below Average\n5. Above Average\n6. Below Average\n7. Above Average\n8. Above Average\n\n### Outliers\n\n* None Found"
+      }
+    ],
+    "dialogue_metadata": {
+      "id": "Amazon_Sample_Notebook_5",
+      "length": 2
     }
   }
 ]

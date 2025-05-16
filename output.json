@@ -1,0 +1,135 @@
+{
+  "turns": [
+    {
+      "prompt": "Generate a comprehensive system diagnostic report from the following raw log entries.  \n- Begin with Report Start: and end with Report End.  \n- Use “###” to separate at least 4 distinct sections (e.g., Overview, Metrics, Warnings, Conclusions).  \n- Capitalize the first letter of the word “error” for each sentence.  \n- Mention the word “system” at least 3 times.  \n- Do not use any commas.  \n- The entire output must be under 1,000 characters.  \n- Wrap the whole report in double quotation marks.  \n\nRaw logs:\n\n\\[2025-05-16 08:15:23] INFO: System boot sequence initiated  \n\\[2025-05-16 08:15:24] WARN: Minor latency detected in module A  \n\\[2025-05-16 08:15:25] ERROR: Unexpected shutdown in module B  \n\\[2025-05-16 08:15:26] INFO: System reboot successful  \n\\[2025-05-16 08:15:27] ERROR: Disk read timeout in module C  \n\\[2025-05-16 08:15:28] INFO: All modules running within normal parameters\n\n\n**[turn_metadata]**\n\n```\n{\n  \"instruction_id_list\": [\n    \"startend:start_checker\",\n    \"startend:end_checker\",\n    \"detectable_format:multiple_sections\",\n    \"change_case:first_letter_cap_target\",\n    \"keywords:frequency\",\n    \"punctuation:no_comma\",\n    \"length_constraints:number_characters\",\n    \"startend:quotation\"\n  ],\n  \"kwargs\": [\n    {\n      \"start_phrase\": \"Report Start:\"\n    },\n    {\n      \"end_phrase\": \"Report End.\"\n    },\n    {\n      \"section_splitter\": \"###\",\n      \"relation\": \"at least\",\n      \"num_sections\": 4\n    },\n    {\n      \"target_string\": \"error\"\n    },\n    {\n      \"keyword\": \"system\",\n      \"relation\": \"at least\",\n      \"frequency\": 3\n    },\n    {\n      \"relation\": \"less than\",\n      \"num_chars\": 1000\n    }\n  ]\n}\n```",
+      "response": "",
+      "instructions": [
+        {
+          "instruction_id_list": [
+            "startend:start_checker",
+            "startend:end_checker",
+            "detectable_format:multiple_sections",
+            "change_case:first_letter_cap_target",
+            "keywords:frequency",
+            "punctuation:no_comma",
+            "length_constraints:number_characters",
+            "startend:quotation"
+          ],
+          "kwargs": [
+            {
+              "start_phrase": "Report Start:"
+            },
+            {
+              "end_phrase": "Report End."
+            },
+            {
+              "section_splitter": "###",
+              "relation": "at least",
+              "num_sections": 4
+            },
+            {
+              "target_string": "error"
+            },
+            {
+              "keyword": "system",
+              "relation": "at least",
+              "frequency": 3
+            },
+            {
+              "relation": "less than",
+              "num_chars": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prompt": "Rewrite the diagnostic report above as a numbered list of exactly four items. Each item should begin with the section title (Overview, Metrics, Warnings, Conclusions) followed by its content. Preserve all existing constraints (capitalize only the first letter of each “error”, use no commas, wrap the entire output in quotation marks, and keep Report Start: at the top and Report End at the bottom).\n\n**[turn_metadata]**\n\n```\n{\n  \"instruction_id_list\": [\n    \"startend:start_checker\",\n    \"startend:end_checker\",\n    \"detectable_format:numbered_list\",\n    \"change_case:first_letter_cap_target\",\n    \"keywords:frequency\",\n    \"punctuation:no_comma\",\n    \"length_constraints:number_characters\",\n    \"startend:quotation\"\n  ],\n  \"kwargs\": [\n    {\n      \"start_phrase\": \"Report Start:\"\n    },\n    {\n      \"end_phrase\": \"Report End\"\n    },\n    {\n      \"relation\": \"equal to\",\n      \"num_numbered_items\": 4\n    },\n    {\n      \"target_string\": \"error\"\n    },\n    {\n      \"keyword\": \"system\",\n      \"relation\": \"at least\",\n      \"frequency\": 3\n    },\n    {\n      \"relation\": \"less than\",\n      \"num_chars\": 1000\n    }\n  ]\n}\n\n```",
+      "response": "",
+      "instructions": [
+        {
+          "instruction_id_list": [
+            "startend:start_checker",
+            "startend:end_checker",
+            "detectable_format:numbered_list",
+            "change_case:first_letter_cap_target",
+            "keywords:frequency",
+            "punctuation:no_comma",
+            "length_constraints:number_characters",
+            "startend:quotation"
+          ],
+          "kwargs": [
+            {
+              "start_phrase": "Report Start:"
+            },
+            {
+              "end_phrase": "Report End"
+            },
+            {
+              "relation": "equal to",
+              "num_numbered_items": 4
+            },
+            {
+              "target_string": "error"
+            },
+            {
+              "keyword": "system",
+              "relation": "at least",
+              "frequency": 3
+            },
+            {
+              "relation": "less than",
+              "num_chars": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prompt": "Rewrite the diagnostic report above as a Markdown document wrapped in ```markdown fences. Use ## to separate exactly four sections—Overview, Metrics, Warnings, Conclusions. Under each section, include at least two bullet points summarizing its content. Apply alternating case to every occurrence of “system.”(start with upper-case) Append a postscript denoted by PS: at the end. Ensure the letter “S” appears at least four times across the document. Do not use the word “error.” Avoid any commas. Keep the total word count (do not count if the word contains only special characters) under 150.\n\n**[turn_metadata]**\n\n```\n{\n  \"instruction_id_list\": [\n    \"detectable_format:multiple_sections\",\n    \"change_case:alternating_target\",\n    \"detectable_content:postscript\",\n    \"keywords:letter_frequency\",\n    \"keywords:forbidden_words\",\n    \"punctuation:no_comma\",\n    \"length_constraints:number_words\"\n  ],\n  \"kwargs\": [\n    {\n      \"section_splitter\": \"##\",\n      \"relation\": \"equal to\",\n      \"num_sections\": 4\n    },\n    {\n      \"target_string\": \"system\"\n    },\n    {\n      \"postscript_marker\": \"PS:\"\n    },\n    {\n      \"letter\": \"S\",\n      \"let_relation\": \"at least\",\n      \"let_frequency\": 4\n    },\n    {\n      \"forbidden_words\": [\"error\"]\n    },\n    {\n      \"relation\": \"less than\",\n      \"num_words\": 150\n    }\n  ]\n}\n```",
+      "response": "",
+      "instructions": [
+        {
+          "instruction_id_list": [
+            "detectable_format:multiple_sections",
+            "change_case:alternating_target",
+            "detectable_content:postscript",
+            "keywords:letter_frequency",
+            "keywords:forbidden_words",
+            "punctuation:no_comma",
+            "length_constraints:number_words"
+          ],
+          "kwargs": [
+            {
+              "section_splitter": "##",
+              "relation": "equal to",
+              "num_sections": 4
+            },
+            {
+              "target_string": "system"
+            },
+            {
+              "postscript_marker": "PS:"
+            },
+            {
+              "letter": "S",
+              "let_relation": "at least",
+              "let_frequency": 4
+            },
+            {
+              "forbidden_words": ["error"]
+            },
+            {
+              "relation": "less than",
+              "num_words": 150
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogue_metadata": {
+    "id": "Amazon - Sample notebook 1",
+    "length": 3
+  }
+}

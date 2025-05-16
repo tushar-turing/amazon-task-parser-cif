@@ -1,27 +1,57 @@
 import json
-import re
 import nbformat
 import os
 import sys
 import glob
 
-def extract_turns_from_markdown(markdown_text):
+def get_cell_text(cell):
+    """Safely join multiline or string cell contents."""
+    return ''.join(cell['source']) if isinstance(cell['source'], list) else cell['source']
+
+def is_user_cell(cell):
+    """Check if the cell is a user cell."""
+    return cell['cell_type'] == 'markdown' and '**[user]**' in get_cell_text(cell)
+
+def is_assistant_cell(cell):
+    """Check if the cell is an assistant cell."""
+    return cell['cell_type'] == 'markdown' and '**[assistant]**' in get_cell_text(cell)
+
+def is_metadata_cell(cell):
+    """Check if the cell is a metadata cell."""
+    return cell['cell_type'] == 'markdown' and '**[turn_metadata]**' in get_cell_text(cell)
+
+def extract_json_from_metadata_cell(source_text):
+    try:
+        start = source_text.find("```")
+        end = source_text.rfind("```")
+        if start == -1 or end == -1 or start == end:
+            return {}
+        json_str = source_text[start+3:end].strip()
+        return json.loads(json_str)
+    except json.JSONDecodeError as e:
+        print("JSON decode error:", e)
+        return {}
+
+def process_notebook(file_path, dialogue_id=None):
+    with open(file_path, "r", encoding="utf-8") as f:
+        nb = nbformat.read(f, as_version=4)
+
     turns = []
-    # Split by user block (each turn starts with **[user]**)
-    blocks = re.split(r'\*\*\[user\]\*\*', markdown_text)
+    cells = nb['cells']
+    i = 0
 
-    for block in blocks[1:]:  # skip any preamble before first user block
-        try:
-            prompt_match = re.search(r'\n+(.*?)\n+\*\*\[assistant\]\*\*', block, re.DOTALL)
-            response_match = re.search(r'\*\*\[assistant\]\*\*\n+(.*?)\n+\*\*\[turn_metadata\]\*\*', block, re.DOTALL)
-            metadata_match = re.search(r'\*\*\[turn_metadata\]\*\*\n+```(?:json)?\n(.+?)```', block, re.DOTALL)
+    while i < len(cells) - 2:
+        user_cell = cells[i]
+        metadata_cell = cells[i + 1]    
+        assistant_cell = cells[i + 2]
 
-            prompt = prompt_match.group(1).strip() if prompt_match else ""
-            response = response_match.group(1).strip() if response_match else ""
-            instruction_block = metadata_match.group(1).strip() if metadata_match else "{}"
-            instruction_data = json.loads(instruction_block)
+        if is_user_cell(user_cell) and is_assistant_cell(assistant_cell) and is_metadata_cell(metadata_cell):
+            prompt = get_cell_text(user_cell).replace('**[user]**', '').strip()
+            response = get_cell_text(assistant_cell).replace('**[assistant]**', '').strip()
+            metadata_text = get_cell_text(metadata_cell)
+            instruction_data = extract_json_from_metadata_cell(metadata_text)
 
-            turn = {
+            turns.append({
                 "prompt": prompt,
                 "response": response,
                 "instructions": [
@@ -30,35 +60,20 @@ def extract_turns_from_markdown(markdown_text):
                         "kwargs": instruction_data.get("kwargs", [])
                     }
                 ]
-            }
+            })
 
-            turns.append(turn)
-        except Exception as e:
-            print("Skipping block due to error:", e)
-            continue
+            i += 3  # Advance to next triplet
+        else:
+            i += 1  # Skip malformed or extra cells
 
-    return turns
-
-
-def process_notebook(ipynb_path, dialogue_id=None):
-    with open(ipynb_path, "r", encoding="utf-8") as f:
-        nb = nbformat.read(f, as_version=4)
-
-    # Combine all markdown cells into one big string
-    full_markdown = ""
-    for cell in nb['cells']:
-        if cell['cell_type'] == 'markdown':
-            full_markdown += ''.join(cell['source']) + "\n\n"
-
-    turns = extract_turns_from_markdown(full_markdown)
-    result = {
+    return {
         "turns": turns,
         "dialogue_metadata": {
-            "id": dialogue_id or os.path.basename(ipynb_path),
+            "id": dialogue_id or os.path.basename(file_path),
             "length": len(turns)
         }
     }
-    return result
+
 
 
 if __name__ == "__main__":

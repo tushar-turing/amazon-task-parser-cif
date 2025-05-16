@@ -2,8 +2,8 @@
   {
     "turns": [
       {
-        "prompt": "hey.. ive got a draft onboarding email that I need you to transform with a bunch of specific formatting rules. Here’s what I need:\n\nIt must start with Welcome Aboard: and wrap the entire message in triple angle-brackets, e.g. <<<Welcome …  >>>.\nEvery sentence in the body should be First-Letter Capitalized (the rest lowercase).\nInclude a numbered list of exactly 5 steps describing next actions.\nAfter the main text, add a JSON block with two arrays, \"key_topics\" and \"action_items\", each containing at least 4 entries.\nThe word success must appear at least 2 times but no more than 4.\nMake sure there is at least one placeholder like {start_date}\nAny occurrence of the phrase best practices must be in quotes\nThe total output must be between 80 and 90 words inclusive counting all the space separtaed units as words\nFinally, end with the sign-off Cheers, followed by the angular brackets\n<<< ... Cheers,>>>\n\nHere’s the draft to transform:  \nhi team welcome to the company we are thrilled to have you our first week will cover orientation security training and product walkthrough please reach out if you have any questions looking forward to your contributions\n\nThanks!\n\n**[turn_metadata]**\n\n```\n{\n  \"instruction_id_list\": [\n    \"startend:start_checker\",\n    \"startend:end_checker\",\n    \"detectable_format:numbered_list\",\n    \"detectable_content:number_placeholders\",\n    \"keywords:frequency\",\n    \"keywords:frequency\",\n    \"length_constraints:number_words\",\n    \"length_constraints:number_words\"\n  ],\n  \"kwargs\": [\n    {\n      \"start_phrase\": \"<<<Welcome Aboard:\"\n    },\n    {\n      \"end_phrase\": \"Cheers,>>>\"\n    },\n    {\n      \"relation\": \"equal to\",\n      \"num_numbered_items\": 5\n    },\n    {\n      \"relation\": \"at least\",\n      \"num_placeholders\": 1\n    },\n    {\n      \"keyword\": \"success\",\n      \"relation\": \"at least\",\n      \"frequency\": 2\n    },\n    {\n      \"keyword\": \"success\",\n      \"relation\": \"less than\",\n      \"frequency\": 5\n    },\n    {\n      \"relation\": \"at least\",\n      \"num_words\": 80\n    },\n    {\n      \"relation\": \"less than\",\n      \"num_words\": 91\n    }\n  ]\n}\n```",
-        "response": "",
+        "prompt": "hey.. ive got a draft onboarding email that I need you to transform with a bunch of specific formatting rules. Here’s what I need:\n\nIt must start with Welcome Aboard: and wrap the entire message in triple angle-brackets, e.g. <<<Welcome …  >>>.\nEvery sentence in the body should be First-Letter Capitalized (the rest lowercase).\nInclude a numbered list of exactly 5 steps describing next actions.\nAfter the main text, add a JSON block with two arrays, \"key_topics\" and \"action_items\", each containing at least 4 entries.\nThe word success must appear at least 2 times but no more than 4.\nMake sure there is at least one placeholder like {start_date}\nAny occurrence of the phrase best practices must be in quotes\nThe total output must be between 80 and 90 words inclusive counting all the space separtaed units as words\nFinally, end with the sign-off Cheers, followed by the angular brackets\n<<< ... Cheers,>>>\n\nHere’s the draft to transform:  \nhi team welcome to the company we are thrilled to have you our first week will cover orientation security training and product walkthrough please reach out if you have any questions looking forward to your contributions\n\nThanks!",
+        "response": "<<<Welcome Aboard:\n\nHi team welcome to your new journey starting {start_date}. Our first week covers orientation security training and a detailed product walkthrough. Please follow these \"best practices\" steps to ensure success:\n\n1. Review orientation materials carefully\n2. Complete mandatory security training modules\n3. Participate actively in product walkthrough\n4. Set up your workspace effectively\n5. Reach out promptly with questions\n\nYour engagement is key to everyone's success.\n\n{\n  \"key_topics\": [\"Orientation\", \"Security Training\", \"Product Walkthrough\", \"Workspace Setup\"],\n  \"action_items\": [\"Review Materials\", \"Complete Modules\", \"Engage in Walkthrough\", \"Set Up Workspace\"]\n}\n\nCheers,>>>",
         "instructions": [
           {
             "instruction_id_list": [
@@ -54,8 +54,8 @@
         ]
       },
       {
-        "prompt": "let’s take that nboarding email and turn it into a Slack announcement. Here’s the new instruction set:\n\nstart with\n/announce ONBOARDING UPDATE\n\nInclude a bullet list of exactly 4 items, each bullet starting with :white_check_mark:\n\nThe word \"team\" must appear at least 3 times, and success no more than once\n\nUse exactly one placeholder {team_lead}\n\nEnsure the whole output is between 70 and 75 words\n\nEnd with :calendar:\n\nGive me that full Slack-ready announcement.\n\n**[turn_metadata]**\n```\n{\n  \"instruction_id_list\": [\n    \"startend:start_checker\",\n    \"detectable_format:number_bullet_lists\",\n    \"keywords:frequency\",\n    \"keywords:frequency\",\n    \"detectable_content:number_placeholders\",\n    \"length_constraints:number_words\",\n    \"length_constraints:number_words\",\n    \"startend:end_checker\"\n  ],\n  \"kwargs\": [\n    {\"start_phrase\": \"/announce ONBOARDING UPDATE\"},\n    {\"relation\": \"equal to\", \"num_bullets\": 4},\n    {\"keyword\": \"team\", \"relation\": \"at least\", \"frequency\": 3},\n    {\"keyword\": \"success\", \"relation\": \"less than\", \"frequency\": 2},\n    {\"relation\": \"equal to\", \"num_placeholders\": 1},\n    {\"relation\": \"at least\", \"num_words\": 70},\n    {\"relation\": \"less than\", \"num_words\": 76},\n    {\"end_phrase\": \":calendar:\"}\n  ]\n}\n```",
-        "response": "",
+        "prompt": "let’s take that nboarding email and turn it into a Slack announcement. Here’s the new instruction set:\n\nstart with\n/announce ONBOARDING UPDATE\n\nInclude a bullet list of exactly 4 items, each bullet starting with :white_check_mark:\n\nThe word \"team\" must appear at least 3 times, and success no more than once\n\nUse exactly one placeholder {team_lead}\n\nEnsure the whole output is between 70 and 75 words\n\nEnd with :calendar:\n\nGive me that full Slack-ready announcement.",
+        "response": "/announce ONBOARDING UPDATE\n\nHey team exciting onboarding news! Our team starts with {team_lead} guiding your journey. Here’s how the team will ensure a smooth start:\n\n:white_check_mark: Attend orientation sessions  \n:white_check_mark: Complete security training  \n:white_check_mark: Engage in product walkthrough  \n:white_check_mark: Prepare workspace setups  \n\nTeam collaboration and active participation will lead us all to success. Reach out to your team for any help needed. Let's kick off together and make this onboarding memorable!\n\n:calendar:",
         "instructions": [
           {
             "instruction_id_list": [
@@ -104,32 +104,152 @@
             ]
           }
         ]
+      },
+      {
+        "prompt": "now i need you to dissect our Slack announcement draft with a mix of extraction and classification:\n\nPull out exactly the four :white_check_mark: bullet items as they appear.\nClassify each one into one of these categories: “Product Walkthrough”, “Security Training”, “Orientation”,   or “Workspace Setup”.\nDetect the single placeholder token and return it in ALL CAPS.\nensure “success” does not appear at all.\nConfirm that the letter “e” shows up at least 15 times across the response.\nWrap your response in a json code block containing \"keys steps\", \"classification\", \"placeholder\", and \"e_count\". Keep the entire output under 400 characters.",
+        "response": "```json\n{\n  \"steps\": [\n    \"Attend orientation sessions\",\n    \"Complete security training\",\n    \"Engage in product walkthrough\",\n    \"Prepare workspace setups\"\n  ],\n  \"classification\": [\n    \"Orientation\",\n    \"Security Training\",\n    \"Product Walkthrough\",\n    \"Workspace Setup\"\n  ],\n  \"placeholder\": \"{TEAM_LEAD}\",\n  \"e_count\": 20\n}\n```",
+        "instructions": [
+          {
+            "instruction_id_list": [
+              "keywords:forbidden_words",
+              "detectable_content:number_placeholders",
+              "keywords:letter_frequency",
+              "length_constraints:number_characters",
+              "startend:wrap_checker"
+            ],
+            "kwargs": [
+              {
+                "forbidden_words": [
+                  "success"
+                ]
+              },
+              {
+                "relation": "equal to",
+                "num_placeholders": 1
+              },
+              {
+                "letter": "e",
+                "let_relation": "at least",
+                "let_frequency": 15
+              },
+              {
+                "relation": "less than",
+                "num_chars": 400
+              },
+              {
+                "wrap_phrase": "```json"
+              }
+            ]
+          }
+        ]
       }
     ],
     "dialogue_metadata": {
       "id": "Amazon_Sample_Notebook_2",
-      "length": 2
+      "length": 3
     }
   },
   {
     "turns": [
       {
-        "prompt": "Generate a quarterly marketing email report summary in valid JSON wrapped in ``` on either side. Begin with Email Begin: and end with Email End.  \n• Under the key “Highlights” include exactly five points  \n• Use the word “IMPORTANT” exactly once in all caps  \n• Include a “P.S.” field with a short note  \n• Mention ROI, conversion, and engagement each at least once  \n• Use campaign at least three times  \n• Ensure the letter C appears exactly 6 times  \n• Do not use the words delay or issue    \n• Total word count must be under 200\n\n```csv\nCampaign,Impressions,Clicks,CTR (%),Conversions,Conv Rate (%),Spend ($),CPC ($),Revenue ($),ROI (%),Engagement Score\nSpring_Sale,120000,4800,4.0,320,6.7,15000,3.12,45000,200,82\nNew_Product_Launch,95000,3800,4.0,290,7.6,12500,3.29,36000,188,75\nSummer_Promo,110000,5100,4.6,410,8.0,18000,3.53,55000,206,88\nHoliday_Countdown,130000,6500,5.0,580,8.9,20000,3.08,70000,250,90\nLoyalty_ThankYou,80000,3200,4.0,260,8.1,10000,3.13,30000,200,80\n```\n\n**[tool]**\n\n```\n{\n  \"instruction_id_list\": [\n    \"startend:start_checker\",\n    \"startend:end_checker\",\n    \"detectable_format:json_format\",\n    \"keywords:frequency\",\n    \"keywords:existence\",\n    \"keywords:frequency\",\n    \"keywords:letter_frequency\",\n    \"keywords:forbidden_words\",\n    \"length_constraints:number_words\",\n    \"detectable_content:postscript\"\n  ],\n  \"kwargs\": [\n    {\n      \"start_phrase\": \"Email Begin:\"\n    },\n    {\n      \"end_phrase\": \"Email End.\"\n    },\n    {\n      \"keyword\": \"IMPORTANT\",\n      \"relation\": \"equal to\",\n      \"frequency\": 1\n    },\n    {\n      \"keywords\": [\"ROI\", \"conversion\", \"engagement\"]\n    },\n    {\n      \"keyword\": \"campaign\",\n      \"relation\": \"at least\",\n      \"frequency\": 3\n    },\n    {\n      \"letter\": \"C\",\n      \"let_relation\": \"equal to\",\n      \"let_frequency\": 6\n    },\n    {\n      \"forbidden_words\": [\"delay\", \"issue\"]\n    },\n    {\n      \"relation\": \"less than\",\n      \"num_words\": 200\n    },\n    {\n      \"postscript_marker\": \"P.S.\"\n    }\n  ]\n}\n```",
-        "response": "",
+        "prompt": "Generate a quarterly marketing email report summary in valid JSON wrapped in ``` on either side. Begin with Email Begin: and end with Email End.  \n• Under the key “Highlights” include exactly five points  \n• Use the word “IMPORTANT” exactly once in all caps  \n• Include a “P.S.” field with a short note  \n• Mention ROI, conversion, and engagement each at least once  \n• Use campaign at least three times  \n• Ensure the letter C appears exactly 6 times  \n• Do not use the words delay or issue    \n• Total word count must be under 200\n\n```csv\nCampaign,Impressions,Clicks,CTR (%),Conversions,Conv Rate (%),Spend ($),CPC ($),Revenue ($),ROI (%),Engagement Score\nSpring_Sale,120000,4800,4.0,320,6.7,15000,3.12,45000,200,82\nNew_Product_Launch,95000,3800,4.0,290,7.6,12500,3.29,36000,188,75\nSummer_Promo,110000,5100,4.6,410,8.0,18000,3.53,55000,206,88\nHoliday_Countdown,130000,6500,5.0,580,8.9,20000,3.08,70000,250,90\nLoyalty_ThankYou,80000,3200,4.0,260,8.1,10000,3.13,30000,200,80\n```",
+        "response": "Email Begin:\n\n```json\n{\n  \"Subject\": \"Quarterly Campaign Report Summary\",\n  \"Highlights\": [\n    \"Holiday Countdown campaign achieved the highest ROI at 250 percent\",\n    \"Summer Promo campaign led in conversions with 410 total\",\n    \"Loyalty ThankYou campaign saw strong engagement scoring 80\",\n    \"Spring Sale campaign had the lowest CPC improving cost control\",\n    \"New Product Launch campaign sustained consistent conversion performance\"\n  ],\n  \"Summary\": \"This quarter featured five core campaigns each contributing to growth in ROI conversion and engagement. The Holiday Countdown stood out with top conversion and engagement metrics. Summer Promo continued to strengthen performance while maintaining budget efficiency. Spring Sale controlled spend effectively. Each campaign showed characteristic strengths enhancing our collective impact. \"IMPORTANT\" metrics were reviewed to support upcoming strategic shifts. Campaign consistency and communication will be key moving forward.\",\n  \"P.S.\": \"Thanks for helping our campaigns connect with customers more effectively.\"\n}\n```\nEmail End.",
         "instructions": [
           {
-            "instruction_id_list": [],
-            "kwargs": []
+            "instruction_id_list": [
+              "startend:start_checker",
+              "startend:end_checker",
+              "detectable_format:json_format",
+              "keywords:frequency",
+              "keywords:existence",
+              "keywords:frequency",
+              "keywords:letter_frequency",
+              "keywords:forbidden_words",
+              "length_constraints:number_words",
+              "detectable_content:postscript"
+            ],
+            "kwargs": [
+              {
+                "start_phrase": "Email Begin:"
+              },
+              {
+                "end_phrase": "Email End."
+              },
+              {
+                "keyword": "IMPORTANT",
+                "relation": "equal to",
+                "frequency": 1
+              },
+              {
+                "keywords": [
+                  "ROI",
+                  "conversion",
+                  "engagement"
+                ]
+              },
+              {
+                "keyword": "campaign",
+                "relation": "at least",
+                "frequency": 3
+              },
+              {
+                "letter": "C",
+                "let_relation": "equal to",
+                "let_frequency": 6
+              },
+              {
+                "forbidden_words": [
+                  "delay",
+                  "issue"
+                ]
+              },
+              {
+                "relation": "less than",
+                "num_words": 200
+              },
+              {
+                "postscript_marker": "P.S."
+              }
+            ]
           }
         ]
       },
       {
-        "prompt": "Classification Begin:\nUsing the CSV data, sort each campaign into one of three ROI tiers—High ROI (≥220%), Medium ROI (180%–219%), Low ROI (< 180%). Produce exactly three numbered sections titled “High ROI,” “Medium ROI,” and “Low ROI,” listing campaign names alongside their ROI values. Mention ROI exactly 13 times. Do not use delay or issue. End with Classification End. Keep the entire output under 150 words.\n\n\n**[tool]**\n\n```\n{\n  \"instruction_id_list\": [\n    \"startend:end_checker\",\n    \"detectable_format:numbered_list\",\n    \"keywords:frequency\",\n    \"keywords:forbidden_words\",\n    \"length_constraints:number_words\"\n  ],\n  \"kwargs\": [\n\n    {\n      \"end_phrase\": \"Classification End.\"\n    },\n    {\n      \"relation\": \"equal to\",\n      \"num_numbered_items\": 3\n    },\n    {\n      \"keyword\": \"ROI\",\n      \"relation\": \"equal to\",\n      \"frequency\": 13\n    },\n    {\n      \"forbidden_words\": [\"delay\", \"issue\"]\n    },\n    {\n      \"relation\": \"less than\",\n      \"num_words\": 150\n    }\n  ]\n}\n```",
-        "response": "",
+        "prompt": "Classification Begin:\nUsing the CSV data, sort each campaign into one of three ROI tiers—High ROI (≥220%), Medium ROI (180%–219%), Low ROI (< 180%). Produce exactly three numbered sections titled “High ROI,” “Medium ROI,” and “Low ROI,” listing campaign names alongside their ROI values. Mention ROI exactly 13 times. Do not use delay or issue. End with Classification End. Keep the entire output under 150 words.",
+        "response": "1. **\"High ROI\"**\n\n* Holiday_Countdown: ROI 250\n\n\n2. **\"Medium ROI\"**\n\n* Spring_Sale: ROI 200\n* Loyalty_ThankYou: ROI 200\n* New_Product_Launch: ROI 188\n* Summer_Promo: ROI 206\n\n3. **\"Low ROI\"**\n\n* (No campaigns in this tier)\n\nThis quarter’s campaign ROI classification highlights how strategic alignment drives results. Holiday\\_Countdown leads with top-tier ROI while Summer\\_Promo also exceeded the 200 mark. The Medium ROI tier reflects consistent campaign contributions with values just below the high threshold. No campaign fell into the Low ROI category this time which confirms strong cross-channel performance. Overall ROI analysis shows focused execution with measurable gains.\n\nClassification End.",
         "instructions": [
           {
-            "instruction_id_list": [],
-            "kwargs": []
+            "instruction_id_list": [
+              "startend:end_checker",
+              "detectable_format:numbered_list",
+              "keywords:frequency",
+              "keywords:forbidden_words",
+              "length_constraints:number_words"
+            ],
+            "kwargs": [
+              {
+                "end_phrase": "Classification End."
+              },
+              {
+                "relation": "equal to",
+                "num_numbered_items": 3
+              },
+              {
+                "keyword": "ROI",
+                "relation": "equal to",
+                "frequency": 13
+              },
+              {
+                "forbidden_words": [
+                  "delay",
+                  "issue"
+                ]
+              },
+              {
+                "relation": "less than",
+                "num_words": 150
+              }
+            ]
           }
         ]
       }
@@ -142,8 +262,8 @@
   {
     "turns": [
       {
-        "prompt": "Generate a comprehensive system diagnostic report from the following raw log entries.  \n- Begin with Report Start: and end with Report End.  \n- Use “###” to separate at least 4 distinct sections (e.g., Overview, Metrics, Warnings, Conclusions).  \n- Capitalize the first letter of the word “error” for each sentence.  \n- Mention the word “system” at least 3 times.  \n- Do not use any commas.  \n- The entire output must be under 1,000 characters.  \n- Wrap the whole report in double quotation marks.  \n\nRaw logs:\n\n\\[2025-05-16 08:15:23] INFO: System boot sequence initiated  \n\\[2025-05-16 08:15:24] WARN: Minor latency detected in module A  \n\\[2025-05-16 08:15:25] ERROR: Unexpected shutdown in module B  \n\\[2025-05-16 08:15:26] INFO: System reboot successful  \n\\[2025-05-16 08:15:27] ERROR: Disk read timeout in module C  \n\\[2025-05-16 08:15:28] INFO: All modules running within normal parameters\n\n\n**[turn_metadata]**\n\n```\n{\n  \"instruction_id_list\": [\n    \"startend:start_checker\",\n    \"startend:end_checker\",\n    \"detectable_format:multiple_sections\",\n    \"change_case:first_letter_cap_target\",\n    \"keywords:frequency\",\n    \"punctuation:no_comma\",\n    \"length_constraints:number_characters\",\n    \"startend:quotation\"\n  ],\n  \"kwargs\": [\n    {\n      \"start_phrase\": \"Report Start:\"\n    },\n    {\n      \"end_phrase\": \"Report End.\"\n    },\n    {\n      \"section_splitter\": \"###\",\n      \"relation\": \"at least\",\n      \"num_sections\": 4\n    },\n    {\n      \"target_string\": \"error\"\n    },\n    {\n      \"keyword\": \"system\",\n      \"relation\": \"at least\",\n      \"frequency\": 3\n    },\n    {\n      \"relation\": \"less than\",\n      \"num_chars\": 1000\n    }\n  ]\n}\n```",
-        "response": "",
+        "prompt": "Generate a comprehensive system diagnostic report from the following raw log entries.  \n- Begin with Report Start: and end with Report End.  \n- Use “###” to separate at least 4 distinct sections (e.g., Overview, Metrics, Warnings, Conclusions).  \n- Capitalize the first letter of the word “error” for each sentence.  \n- Mention the word “system” at least 3 times.  \n- Do not use any commas.  \n- The entire output must be under 1,000 characters.  \n- Wrap the whole report in double quotation marks.  \n\nRaw logs:\n\n\\[2025-05-16 08:15:23] INFO: System boot sequence initiated  \n\\[2025-05-16 08:15:24] WARN: Minor latency detected in module A  \n\\[2025-05-16 08:15:25] ERROR: Unexpected shutdown in module B  \n\\[2025-05-16 08:15:26] INFO: System reboot successful  \n\\[2025-05-16 08:15:27] ERROR: Disk read timeout in module C  \n\\[2025-05-16 08:15:28] INFO: All modules running within normal parameters",
+        "response": "\"Report Start:\n\n### Overview\n\nThe system began its boot sequence at 08:15:23 on 2025-05-16. Initial operations showed standard activity. A minor issue appeared early but recovery was rapid.\n\n### Metrics\n\nThe system booted and rebooted successfully\nLatency detected in module A\nTwo Error entries recorded\nThe system stabilized within seconds\n\n### Warnings\n\nOne warning issued for latency in module A\nTwo Error reports logged including an unexpected shutdown in module B and a disk read timeout in module C\n\n### Conclusions\n\nThe system experienced temporary faults but maintained core functionality. Quick reboot ensured continuity. Monitoring advised due to repeated Error events. System stability appears restored.\n\nReport End.\"",
         "instructions": [
           {
             "instruction_id_list": [
@@ -185,8 +305,8 @@
         ]
       },
       {
-        "prompt": "Rewrite the diagnostic report above as a numbered list of exactly four items. Each item should begin with the section title (Overview, Metrics, Warnings, Conclusions) followed by its content. Preserve all existing constraints (capitalize only the first letter of each “error”, use no commas, wrap the entire output in quotation marks, and keep Report Start: at the top and Report End at the bottom).\n\n**[turn_metadata]**\n\n```\n{\n  \"instruction_id_list\": [\n    \"startend:start_checker\",\n    \"startend:end_checker\",\n    \"detectable_format:numbered_list\",\n    \"change_case:first_letter_cap_target\",\n    \"keywords:frequency\",\n    \"punctuation:no_comma\",\n    \"length_constraints:number_characters\",\n    \"startend:quotation\"\n  ],\n  \"kwargs\": [\n    {\n      \"start_phrase\": \"Report Start:\"\n    },\n    {\n      \"end_phrase\": \"Report End\"\n    },\n    {\n      \"relation\": \"equal to\",\n      \"num_numbered_items\": 4\n    },\n    {\n      \"target_string\": \"error\"\n    },\n    {\n      \"keyword\": \"system\",\n      \"relation\": \"at least\",\n      \"frequency\": 3\n    },\n    {\n      \"relation\": \"less than\",\n      \"num_chars\": 1000\n    }\n  ]\n}\n\n```",
-        "response": "",
+        "prompt": "Rewrite the diagnostic report above as a numbered list of exactly four items. Each item should begin with the section title (Overview, Metrics, Warnings, Conclusions) followed by its content. Preserve all existing constraints (capitalize only the first letter of each “error”, use no commas, wrap the entire output in quotation marks, and keep Report Start: at the top and Report End at the bottom).",
+        "response": "\"Report Start:\n\n1. Overview: The system began its boot sequence at 08:15:23 on 2025-05-16. Initial operations showed standard activity. A minor issue appeared early but recovery was rapid.\n2. Metrics: System booted and rebooted successfully. Latency detected in module A. Two Error entries recorded. System stabilized within seconds.\n3. Warnings: One warning issued for latency in module A. Two Error reports logged including an unexpected shutdown in module B and a disk read timeout in module C.\n4. Conclusions: The system experienced temporary faults but maintained core functionality. Quick reboot ensured continuity. Monitoring advised due to repeated Error events. System stability appears restored.  \n\nReport End\"",
         "instructions": [
           {
             "instruction_id_list": [
@@ -227,8 +347,8 @@
         ]
       },
       {
-        "prompt": "Rewrite the diagnostic report above as a Markdown document wrapped in ```markdown fences. Use ## to separate exactly four sections—Overview, Metrics, Warnings, Conclusions. Under each section, include at least two bullet points summarizing its content. Apply alternating case to every occurrence of “system.”(start with upper-case) Append a postscript denoted by PS: at the end. Ensure the letter “S” appears at least four times across the document. Do not use the word “error.” Avoid any commas. Keep the total word count (do not count if the word contains only special characters) under 150.\n\n**[turn_metadata]**\n\n```\n{\n  \"instruction_id_list\": [\n    \"detectable_format:multiple_sections\",\n    \"change_case:alternating_target\",\n    \"detectable_content:postscript\",\n    \"keywords:letter_frequency\",\n    \"keywords:forbidden_words\",\n    \"punctuation:no_comma\",\n    \"length_constraints:number_words\"\n  ],\n  \"kwargs\": [\n    {\n      \"section_splitter\": \"##\",\n      \"relation\": \"equal to\",\n      \"num_sections\": 4\n    },\n    {\n      \"target_string\": \"system\"\n    },\n    {\n      \"postscript_marker\": \"PS:\"\n    },\n    {\n      \"letter\": \"S\",\n      \"let_relation\": \"at least\",\n      \"let_frequency\": 4\n    },\n    {\n      \"forbidden_words\": [\"error\"]\n    },\n    {\n      \"relation\": \"less than\",\n      \"num_words\": 150\n    }\n  ]\n}\n```",
-        "response": "",
+        "prompt": "Rewrite the diagnostic report above as a Markdown document wrapped in ```markdown fences. Use ## to separate exactly four sections—Overview, Metrics, Warnings, Conclusions. Under each section, include at least two bullet points summarizing its content. Apply alternating case to every occurrence of “system.”(start with upper-case) Append a postscript denoted by PS: at the end. Ensure the letter “S” appears at least four times across the document. Do not use the word “error.” Avoid any commas. Keep the total word count (do not count if the word contains only special characters) under 150.",
+        "response": "```markdown\n## Overview  \n- The SyStEm began its boot sequence at 08:15:23 on 2025-05-16  \n- Initial operations appeared normal with minor delays  \n\n## Metrics  \n- SyStEm rebooted successfully and resumed function  \n- Latency noted in module A and read timeout in module C  \n\n## Warnings  \n- One warning for latency in module A  \n- Unexpected shutdown detected in module B  \n\n## Conclusions  \n- The SyStEm recovered quickly and continued operation  \n- Further monitoring suggested due to past shutdown  \n\nPS: SyStEm shows signs of resilience despite slight issues\n```",
         "instructions": [
           {
             "instruction_id_list": [

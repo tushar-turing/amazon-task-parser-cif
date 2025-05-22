@@ -147,20 +147,28 @@ def validate_instruction(response, inst_type, kwargs, all_instructions=None):
             return (valid, "No error" if valid else f"Expected {rel} {val} lowercase words, found {count}.")
 
         if "_target" in inst_type:
-            target = kwargs["target_string"].lower()
-            words = re.findall(r'\b\w+\b', response)
-            matched_words = [w for w in words if w.lower() == target]
-            if not matched_words:
+            target = kwargs["target_string"].strip().lower()
+            target_escaped = re.escape(target)
+
+            # Handle multi-word phrases with optional quotes
+            pattern = rf'(["\']?{target_escaped}["\']?)'
+            matches = re.findall(pattern, response, re.IGNORECASE)
+
+            if not matches:
                 return (False, f"Target '{target}' not found in response.")
-            for w in matched_words:
-                if inst_type == "change_case:all_caps_target" and not w.isupper():
-                    return (False, f"'{w}' should be ALL CAPS.")
-                elif inst_type == "change_case:lowercase_target" and not w.islower():
-                    return (False, f"'{w}' should be all lowercase.")
-                elif inst_type == "change_case:alternating_target" and not is_strict_alternating(w):
-                    return (False, f"'{w}' is not in alternating caps.")
-                elif inst_type == "change_case:first_letter_cap_target" and not w.istitle():
-                    return (False, f"'{w}' is not first-letter capitalized.")
+
+            for match in matches:
+                raw_text = match.strip('"').strip("'")
+
+                if inst_type == "change_case:all_caps_target" and not raw_text.isupper():
+                    return (False, f"'{raw_text}' should be ALL CAPS.")
+                elif inst_type == "change_case:lowercase_target" and not raw_text.islower():
+                    return (False, f"'{raw_text}' should be all lowercase.")
+                elif inst_type == "change_case:alternating_target" and not is_strict_alternating(raw_text):
+                    return (False, f"'{raw_text}' is not in alternating caps.")
+                elif inst_type == "change_case:first_letter_cap_target" and not raw_text.istitle():
+                    return (False, f"'{raw_text}' is not first-letter capitalized.")
+
             return (True, "No error")
 
         if inst_type == "detectable_content:number_placeholders":
@@ -194,10 +202,14 @@ def validate_instruction(response, inst_type, kwargs, all_instructions=None):
                 return (False, "Response is not valid JSON format.")
 
         if inst_type == "detectable_format:multiple_sections":
-            pattern = rf"^{kwargs['section_splitter']} \d+"
+            splitter = kwargs.get("section_splitter", "").strip()
+            rel = kwargs.get("relation")
+            val = kwargs.get("num_sections")
+
+            # Match lines that contain the splitter + a number, possibly with Markdown prefix like ### or whitespace
+            pattern = rf"^\s*[#>*\-]*\s*{re.escape(splitter)}\s+\d+\b"
             sections = re.findall(pattern, response, re.MULTILINE | re.IGNORECASE)
-            # sections = re.findall(rf"^{kwargs['section_splitter']} \d+", response, re.MULTILINE)
-            rel, val = kwargs["relation"], kwargs["num_sections"]
+
             valid = eval(f"{len(sections)} {'>=' if rel == 'at least' else '==' if rel == 'equal to' else '<'} {val}")
             return (valid, "No error" if valid else f"Expected {rel} {val} sections, found {len(sections)}.")
 
@@ -214,18 +226,29 @@ def validate_instruction(response, inst_type, kwargs, all_instructions=None):
             return (valid, "No error" if valid else f"Expected {rel} {val} bullet points, found {count}.")
 
         if inst_type == "detectable_format:title":
-            return (response.strip().startswith("<<") and response.strip().endswith(">>"),
-                    "No error" if response.strip().startswith("<<") else "Title not wrapped in << >>")
+            lines = response.strip().splitlines()
+            found_title = any(line.strip().startswith("<<") and line.strip().endswith(">>") for line in lines)
+
+            return (
+                found_title,
+                "No error" if found_title else "Title not wrapped in << >> on any line."
+            )
 
         if inst_type == "keywords:existence":
             missing = [kw for kw in kwargs["keywords"] if kw.lower() not in response.lower()]
             return (not missing, "No error" if not missing else f"Missing keyword(s): {missing}")
 
         if inst_type == "keywords:frequency":
-            count = word_frequency(response, kwargs["keyword"])
+            keyword = kwargs["keyword"].lower()
+            words = re.findall(r'\b\w+\b', response.lower())  # case-insensitive, word-split
+            count = sum(1 for w in words if w == keyword)
+
             rel, val = kwargs["relation"], kwargs["frequency"]
             valid = eval(f"{count} {'>=' if rel == 'at least' else '==' if rel == 'equal to' else '<'} {val}")
-            return (valid, "No error" if valid else f"Expected {rel} {val} of '{kwargs['keyword']}', found {count}.")
+            return (
+                valid,
+                "No error" if valid else f"Expected {rel} {val} of '{keyword}', found {count}."
+            )
 
         if inst_type == "keywords:forbidden_words":
             present = [w for w in kwargs["forbidden_words"] if w.lower() in response.lower()]
@@ -266,45 +289,63 @@ def validate_instruction(response, inst_type, kwargs, all_instructions=None):
             )
 
         # Check if the last word of the response matches the end phrase with punctuation
+        # if inst_type == "startend:end_checker":
+        #     required = kwargs["end_phrase"].strip()
+        #     actual_words = response.strip().split()[-len(required.split()):]
+        #     actual_phrase = " ".join(actual_words).strip().strip('"')  # ← do NOT strip punctuation here
+
+        #     required_words = required.split()
+        #     actual_words_clean = [w.strip(string.punctuation) for w in actual_words]
+
+        #     formatted_targets = {}
+        #     if all_instructions:
+        #         for i, id_ in enumerate(all_instructions["instruction_id_list"]):
+        #             if "_target" in id_:
+        #                 t = all_instructions["kwargs"][i]["target_string"].lower()
+        #                 formatted_targets[t] = id_
+
+        #     errors = []
+        #     for i, (expected_word, actual_word) in enumerate(zip(required_words, actual_words_clean)):
+        #         expected_lower = expected_word.lower()
+        #         actual_lower = actual_word.lower()
+
+        #         if expected_lower in formatted_targets:
+        #             fmt = formatted_targets[expected_lower]
+        #             if fmt == "change_case:alternating_target" and not is_strict_alternating(actual_word):
+        #                 errors.append(f"word '{actual_word}' is not alternating caps (expected '{expected_word}')")
+        #             elif fmt == "change_case:all_caps_target" and not actual_word.isupper():
+        #                 errors.append(f"word '{actual_word}' is not all caps (expected '{expected_word}')")
+        #             elif fmt == "change_case:lowercase_target" and not actual_word.islower():
+        #                 errors.append(f"word '{actual_word}' is not lowercase (expected '{expected_word}')")
+        #             elif fmt == "change_case:first_letter_cap_target" and not actual_word.istitle():
+        #                 errors.append(f"word '{actual_word}' is not capitalized (expected '{expected_word}')")
+        #         else:
+        #             if actual_lower != expected_lower:
+        #                 errors.append(f"word '{actual_word}' does not match expected '{expected_word}'")
+
+        #     if actual_phrase != required:
+        #         errors.insert(0, f"Full phrase does not match. Expected '{required}', found '{actual_phrase}'")
+
+        #     if errors:
+        #         return (False, f"End phrase mismatch: expected '{required}', but found '{actual_phrase}' — " + "; ".join(errors))
+        #     return (True, "No error")
+
         if inst_type == "startend:end_checker":
             required = kwargs["end_phrase"].strip()
+
+            # Get the last few words from the response, based on required length
             actual_words = response.strip().split()[-len(required.split()):]
-            actual_phrase = " ".join(actual_words).strip().strip('"')  # ← do NOT strip punctuation here
+            actual_phrase = " ".join(actual_words).strip().strip('"')
 
-            required_words = required.split()
-            actual_words_clean = [w.strip(string.punctuation) for w in actual_words]
+            # Optional debug: print("Required:", required, "Actual:", actual_phrase)
 
-            formatted_targets = {}
-            if all_instructions:
-                for i, id_ in enumerate(all_instructions["instruction_id_list"]):
-                    if "_target" in id_:
-                        t = all_instructions["kwargs"][i]["target_string"].lower()
-                        formatted_targets[t] = id_
-
-            errors = []
-            for i, (expected_word, actual_word) in enumerate(zip(required_words, actual_words_clean)):
-                expected_lower = expected_word.lower()
-                actual_lower = actual_word.lower()
-
-                if expected_lower in formatted_targets:
-                    fmt = formatted_targets[expected_lower]
-                    if fmt == "change_case:alternating_target" and not is_strict_alternating(actual_word):
-                        errors.append(f"word '{actual_word}' is not alternating caps (expected '{expected_word}')")
-                    elif fmt == "change_case:all_caps_target" and not actual_word.isupper():
-                        errors.append(f"word '{actual_word}' is not all caps (expected '{expected_word}')")
-                    elif fmt == "change_case:lowercase_target" and not actual_word.islower():
-                        errors.append(f"word '{actual_word}' is not lowercase (expected '{expected_word}')")
-                    elif fmt == "change_case:first_letter_cap_target" and not actual_word.istitle():
-                        errors.append(f"word '{actual_word}' is not capitalized (expected '{expected_word}')")
-                else:
-                    if actual_lower != expected_lower:
-                        errors.append(f"word '{actual_word}' does not match expected '{expected_word}'")
-
+            # Compare full phrase (with punctuation)
             if actual_phrase != required:
-                errors.insert(0, f"Full phrase does not match. Expected '{required}', found '{actual_phrase}'")
+                return (
+                    False,
+                    f"End phrase mismatch: expected '{required}', but found '{actual_phrase}'"
+                )
 
-            if errors:
-                return (False, f"End phrase mismatch: expected '{required}', but found '{actual_phrase}' — " + "; ".join(errors))
             return (True, "No error")
 
         if inst_type == "startend:wrap_checker":

@@ -92,7 +92,6 @@ def count_numbered_items(response):
 def count_bullet_points(response):
     # Only count bullet points at top-level (start of line, not indented)
     return len(re.findall(r'^[*-•]\s', response, re.MULTILINE))
-    # return len(re.findall(r'^\s*[-*•]\s', response, re.MULTILINE))
 
 def count_placeholders(response):
     return len(re.findall(r'\[.*?\]', response))
@@ -266,7 +265,7 @@ def validate_instruction(response, inst_type, kwargs, all_instructions=None):
         if inst_type == "length_constraints:number_words":
             count = len(re.findall(r'\b[a-zA-Z0-9][a-zA-Z0-9_-]*\b', response))
             rel, val = kwargs["relation"], kwargs["num_words"]
-            # print(f"    ↪ Word count (strict): {count}")  # 🔍 Debug output
+            # print(f"    ↪ Word count (strict): {count}")  # Debug output
             valid = eval(f"{count} {'>=' if rel == 'at least' else '==' if rel == 'equal to' else '<'} {val}")
             return (valid, "No error" if valid else f"Expected {rel} {val} words, found {count}.")
 
@@ -276,48 +275,6 @@ def validate_instruction(response, inst_type, kwargs, all_instructions=None):
                 starts_correctly,
                 "No error" if starts_correctly else "Response does not start with required phrase."
             )
-
-        # Check if the last word of the response matches the end phrase with punctuation
-        # if inst_type == "startend:end_checker":
-        #     required = kwargs["end_phrase"].strip()
-        #     actual_words = response.strip().split()[-len(required.split()):]
-        #     actual_phrase = " ".join(actual_words).strip().strip('"')  # ← do NOT strip punctuation here
-
-        #     required_words = required.split()
-        #     actual_words_clean = [w.strip(string.punctuation) for w in actual_words]
-
-        #     formatted_targets = {}
-        #     if all_instructions:
-        #         for i, id_ in enumerate(all_instructions["instruction_id_list"]):
-        #             if "_target" in id_:
-        #                 t = all_instructions["kwargs"][i]["target_string"].lower()
-        #                 formatted_targets[t] = id_
-
-        #     errors = []
-        #     for i, (expected_word, actual_word) in enumerate(zip(required_words, actual_words_clean)):
-        #         expected_lower = expected_word.lower()
-        #         actual_lower = actual_word.lower()
-
-        #         if expected_lower in formatted_targets:
-        #             fmt = formatted_targets[expected_lower]
-        #             if fmt == "change_case:alternating_target" and not is_strict_alternating(actual_word):
-        #                 errors.append(f"word '{actual_word}' is not alternating caps (expected '{expected_word}')")
-        #             elif fmt == "change_case:all_caps_target" and not actual_word.isupper():
-        #                 errors.append(f"word '{actual_word}' is not all caps (expected '{expected_word}')")
-        #             elif fmt == "change_case:lowercase_target" and not actual_word.islower():
-        #                 errors.append(f"word '{actual_word}' is not lowercase (expected '{expected_word}')")
-        #             elif fmt == "change_case:first_letter_cap_target" and not actual_word.istitle():
-        #                 errors.append(f"word '{actual_word}' is not capitalized (expected '{expected_word}')")
-        #         else:
-        #             if actual_lower != expected_lower:
-        #                 errors.append(f"word '{actual_word}' does not match expected '{expected_word}'")
-
-        #     if actual_phrase != required:
-        #         errors.insert(0, f"Full phrase does not match. Expected '{required}', found '{actual_phrase}'")
-
-        #     if errors:
-        #         return (False, f"End phrase mismatch: expected '{required}', but found '{actual_phrase}' — " + "; ".join(errors))
-        #     return (True, "No error")
 
         if inst_type == "startend:end_checker":
             required = kwargs["end_phrase"].strip()
@@ -412,7 +369,7 @@ def run_batch_processing(input_dir, output_base_dir):
             json.dump(converted, f, indent=2, ensure_ascii=False)
         print(f"✅ Converted JSON saved to: {converted_path}")
 
-        # Step 2: Validate and write .txt
+        # Step 2: Validate and write .json
         validation_txt_path = os.path.join(output_dir, "validation_report.json")
         run_validation(converted_path, validation_txt_path)
 

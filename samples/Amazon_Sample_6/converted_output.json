@@ -1,0 +1,207 @@
+{
+  "turns": [
+    {
+      "prompt": "ok so i need to submit an essay for tomorrow. we were told to choose any topic of our choice, so i choosed to write on Man utd team. I'm a huge fan. who isn't? ok so i found this interesting article on football written by my friend sometime ago...we are both utd fans. but u know what i cannot submit this essay because they have these strict rules to abide by inorder to prevent from copying directly from other sources.\n\nFirst take a look at this article:\n\n\"Manchester United Football Club is more than just a football team — it is a symbol of resilience, glory, and global identity. Born in the industrial heartlands of Northern England, Manchester United’s journey from a small railway team to one of the most recognized sports institutions in the world is a tale marked by triumph, tragedy, reinvention, and unmatched passion. The club was founded in 1878 as Newton Heath LYR Football Club, representing the Lancashire and Yorkshire Railway depot. The team was originally made up of railway workers and played in green and gold — colors that fans still occasionally don to evoke the club’s roots. Struggling both financially and competitively, Newton Heath was on the brink of collapse by 1902. It was then that local brewer John Henry Davies invested in the club, saving it from extinction and rebranding it as Manchester United. The renaming marked a new era. By 1908, United had won their first league title, followed by an FA Cup in 1909. The club’s early success laid the foundation for a rising identity, but it would take decades before United truly established themselves as a dominant force. One of the most transformative periods in the club’s history came with the appointment of Matt Busby in 1945. Unlike many of his contemporaries, Busby believed in youth development, and under his leadership, the “Busby Babes” — a team of young, homegrown talents — emerged in the 1950s. Players like Duncan Edwards, Roger Byrne, and Tommy Taylor embodied a fearless, fast-paced, attacking style of play that captivated fans across England. But this golden generation was tragically cut short. On February 6, 1958, the team suffered a catastrophic plane crash in Munich, Germany, after a European Cup match. The crash claimed the lives of eight players and left many others injured. The Munich air disaster became a defining moment in Manchester United’s history, not only for its tragedy but for the club’s response. Matt Busby, himself gravely injured, rebuilt the team from the ashes — a story of incredible courage and resolve. In the aftermath of Munich, Busby assembled a new side, including icons such as George Best, Denis Law, and Bobby Charlton — a crash survivor who would go on to become one of United’s greatest players. Their talents converged in the 1968 season when Manchester United became the first English club to win the European Cup, defeating Benfica 4–1 at Wembley Stadium. The victory was not just a sporting achievement — it was an emotional triumph over unimaginable adversity. After years of inconsistency in the 1970s and early 80s, including relegation in 1974 and a lone FA Cup win in 1983, the club’s fortunes transformed once again with the arrival of Sir Alex Ferguson in 1986. The early years of his reign were turbulent, and he was nearly sacked in 1990. But after an FA Cup win that year, the tide turned. What followed was an unprecedented era of success. Under Ferguson, Manchester United won 13 Premier League titles, 5 FA Cups, 2 UEFA Champions League titles, and a historic treble in 1999 — winning the Premier League, FA Cup, and UEFA Champions League in a single season. Players such as Ryan Giggs, Paul Scholes, Roy Keane, Eric Cantona, Cristiano Ronaldo, and Wayne Rooney became household names, as United built a legacy of excellence rooted in attacking football, youth promotion, and relentless ambition. While Manchester United’s on-field dominance was remarkable, its commercial evolution was equally revolutionary. The club capitalized on the explosion of global media in the 1990s and 2000s, becoming one of the most widely supported teams in the world. Tour merchandise, global sponsorships, and pre-season tours transformed United into a billion-dollar brand. The “Red Devils” — a nickname inspired by a local rugby team and adopted under Busby — became synonymous with ambition, drama, and grandeur. In regions from Asia to Africa, Latin America to the Middle East, wearing the red jersey became a badge of identity. United fandom transcended sport, representing community, aspiration, and a connection to greatness. Sir Alex Ferguson retired in 2013, ending a 26-year reign that reshaped the club’s DNA. His departure marked the beginning of a turbulent phase. Successor David Moyes lasted less than a season. Then came Louis van Gaal, José Mourinho, and Ole Gunnar Solskjær, each delivering moments of hope — an FA Cup win, a Europa League title, and some marquee signings — but failing to restore sustained success. Despite investing heavily in players and managerial talent, United struggled with strategic direction, executive mismanagement, and an overreliance on commercial growth over footballing coherence. Yet, fans remained loyal, often voicing their frustration at ownership, particularly the Glazer family, whose leveraged takeover in 2005 remains controversial. Manchester United’s cultural significance runs deep. From songs like “Glory Glory Man United” to the passionate Stretford End chants, matchday at Old Trafford is not just an event — it’s a ritual. The stadium, nicknamed the Theatre of Dreams, is hallowed ground for millions. What sets United apart is its mythology — stories of Munich, the Busby Babes, the Treble, Fergie Time — all woven into a narrative that celebrates resilience, flair, and belief against the odds. The club’s support is not defined by geography, but by shared ideals: loyalty, history, and a refusal to accept mediocrity. As of the mid-2020s, Manchester United stands at a crossroads. While recent investments in players like Bruno Fernandes, Marcus Rashford, and Rasmus Højlund show promise, systemic issues around recruitment, ownership, and infrastructure persist. New managerial approaches under Erik ten Hag have aimed to revive discipline and structure, but consistency remains elusive.\nThere is hope, however, in the club’s renewed emphasis on academy development, fan engagement, and whispers of potential changes in ownership that could realign United with its roots. Young stars, loyal veterans, and an unshakable fan base keep the belief alive — that United will rise again.\nManchester United is not just a football club — it is a living narrative of loss and recovery, tradition and transformation, triumph and hope. Through each era — Busby’s brilliance, Ferguson’s ferocity, and the modern-day quest for identity — United has remained a beacon of global footballing culture.\nWhether battling in the Champions League or rebuilding through setbacks, United represents something timeless: the belief that greatness is not only about victory, but about how one rises, again and again, in pursuit of it.\"\n\nTake the above article as a reference, summarise the article and paraphrase few sentences. So here's the rules to keep in mind while writing the essay:\n\nfirst we need some suitable title for our essay. so keep the title name as \"Manchester United: A Legacy Forged in Triumph and Turmoil\" wrapped in double angular brackets. The response must contain exactly 5 sections. Mark the beginning of each section with a header \"PHASE X\" where X is the number of the section. use exactly 15 bullet points and end with the phrase \"Beep-Beep!\". use the phrase \"Glory Glory Man United\" in all lower case letters. Also use the phrase “Theatre of Dreams” in altermnating capital letters. oh and hey, do not forget to include the keyword \"global\" exactly twice. Almost forgot mate, please use the phrase \"busby babes”, I want the first letter of each word capitalised in this phrase. thanks.",
+      "instructions": {
+        "instruction_id_list": [
+          "detectable_format:title",
+          "detectable_format:multiple_sections",
+          "detectable_format:number_bullet_lists",
+          "startend:end_checker",
+          "change_case:lowercase_target",
+          "change_case:alternating_target",
+          "keywords:frequency",
+          "change_case:first_letter_cap_target",
+          "keywords:existence"
+        ],
+        "kwargs": [
+          {},
+          {
+            "section_splitter": "PHASE",
+            "relation": "equal to",
+            "num_sections": 5
+          },
+          {
+            "relation": "equal to",
+            "num_bullets": 15
+          },
+          {
+            "end_phrase": "Beep-Beep!"
+          },
+          {
+            "target_string": "Glory Glory Man United"
+          },
+          {
+            "target_string": "Theatre of Dreams"
+          },
+          {
+            "keyword": "global",
+            "relation": "equal to",
+            "frequency": 2
+          },
+          {
+            "target_string": "busby babes"
+          },
+          {
+            "keywords": [
+              "busby babes"
+            ]
+          }
+        ]
+      },
+      "response": "<<Manchester United: A Legacy Forged in Triumph and Turmoil>>\n\n### PHASE 1\n\n- Established in 1878 as Newton Heath LYR FC, the club initially served as the football team for railway workers. It represented the pride and camaraderie of Manchester’s industrial workforce.\n\n- On the brink of collapse, the club was saved in 1902 by John Henry Davies, who rebranded it as Manchester United. His financial backing gave the team a second chance and a new identity.\n- United secured their first league title in 1908 followed by the FA Cup in 1909, signaling their rise in English football.These early victories laid the foundation for a culture of ambition and competitive excellence.\n\n### PHASE 2\n- Matt Busby, appointed in 1945, revolutionized the club with a focus on youth development, creating the iconic “Busby Babes”. His approach revolutionized youth development and inspired a new style of football.\n- The team was tragically impacted by the 1958 Munich air disaster, killing 8 players and wounding many others.\n- Despite severe injuries, Busby returned to rebuild the team, showing extraordinary resilience and leadership.\n\n### PHASE 3\n- Sir Alex Ferguson became manager in 1986 and led United to a golden era after a rough start.\n- Ferguson guided United to 13 Premier League titles, 5 FA Cups, 2 Champions League trophies, and the iconic treble in 1999. These achievements made him one of the most decorated managers in football history.\n- Promoted stars like Giggs, Scholes, Keane, Cantona, Ronaldo, Rooney, anchoring United’s reputation for youth and attacking football.\n\n### PHASE 4\n- United capitalized on global media growth in the '90s and 2000s, becoming a billion-dollar global brand.\n- Built a worldwide fan base, with the red jersey symbolizing identity, aspiration, and unity across continents.\n- Cultural symbols like Old Trafford (“ThEaTrE oF dReAmS”), chants, and the \"glory glory man united\" anthem reinforced the club’s mythology. These cultural elements turned match days into experiences of passion and ritual.\n\n### PHASE 5\n- Ferguson’s 2013 retirement triggered instability; successors struggled to deliver consistent success.\n- Despite trophies under Moyes, van Gaal, Mourinho, and Solskjær, the club lacked strategic coherence.\n- With Erik ten Hag at the helm, renewed hope has emerged through youth focus, fan-centric approaches, and prospective ownership change.\nThis transition hints at a revival rooted in stability and vision.\n\nBeep-Beep!"
+    },
+    {
+      "prompt": "well that looks almost great. but i just forgot to mention that the number of words with full captial letters must be atleast 25 and less than 35. Also can we please have the words 'cup' and 'cups' occurring in alternating case in every instance. along with that add one more instance of the word 'global'. Also mate, will ya increase the context a little...let's say min 650 words.",
+      "instructions": {
+        "instruction_id_list": [
+          "detectable_format:title",
+          "detectable_format:multiple_sections",
+          "detectable_format:number_bullet_lists",
+          "startend:end_checker",
+          "change_case:lowercase_target",
+          "change_case:alternating_target",
+          "keywords:frequency",
+          "change_case:first_letter_cap_target",
+          "keywords:existence",
+          "change_case:capital_word_frequency",
+          "change_case:capital_word_frequency",
+          "change_case:alternating_target",
+          "change_case:alternating_target",
+          "length_constraints:number_words"
+        ],
+        "kwargs": [
+          {},
+          {
+            "section_splitter": "PHASE",
+            "relation": "equal to",
+            "num_sections": 5
+          },
+          {
+            "relation": "equal to",
+            "num_bullets": 15
+          },
+          {
+            "end_phrase": "Beep-Beep!"
+          },
+          {
+            "target_string": "Glory Glory Man United"
+          },
+          {
+            "target_string": "Theatre of Dreams"
+          },
+          {
+            "keyword": "global",
+            "relation": "equal to",
+            "frequency": 3
+          },
+          {
+            "target_string": "busby babes"
+          },
+          {
+            "keywords": [
+              "busby babes"
+            ]
+          },
+          {
+            "capital_relation": "at least",
+            "capital_frequency": 25
+          },
+          {
+            "capital_relation": "less than",
+            "capital_frequency": 35
+          },
+          {
+            "target_string": "cup"
+          },
+          {
+            "target_string": "cups"
+          },
+          {
+            "relation": "at least",
+            "num_words": 650
+          }
+        ]
+      },
+      "response": "<<Manchester United: A Legacy Forged in Triumph and Turmoil>>\n\n### PHASE 1: ORIGINS AND RISE\n- Manchester United’s journey began in 1878, when the club was founded as Newton Heath LYR Football Club, originally formed by workers of the Lancashire and Yorkshire Railway. Initially a modest team representing industrial laborers, Newton Heath struggled to stay afloat financially, facing the threat of dissolution at the turn of the century.\n- Salvation came in 1902 when local brewery magnate John Henry Davies intervened with critical financial backing. With his support, the club was rebranded as Manchester United, marking the dawn of a new era.\n- Achieved early success with the first league title in 1908 and the FA CuP in 1909, setting a foundation for future growth. These milestones signaled the club’s growing ambitions and established a competitive identity that would evolve into one of football’s greatest dynasties.\n\n\n\n### PHASE 2: THE BUSBY ERA AND MUNICH TRAGEDY\n- Matt Busby, appointed in 1945, revolutionized the club with a focus on youth development, creating the iconic “Busby Babes”. Their dynamic style and fearless spirit captured the imagination of fans and heralded a new dawn for the club.\n- The team was tragically impacted by the 1958 Munich air disaster, killing 8 players and wounding many others. The Munich Air Disaster was a devastating blow that transcended sport, plunging the club and football community into mourning.\n- Despite severe injuries, Busby returned to rebuild the team, showing extraordinary resilience and leadership. His resilience etched a legacy of courage, loyalty, and perseverance that remains central to the club’s identity.\n\n### PHASE 3: FERGUSON ERA AND MODERN DOMINANCE\n- Sir Alex Ferguson became manager in 1986 and led United to a golden era after a rough start. Though his early years were fraught with challenges and calls for dismissal, Ferguson turned the tide with unwavering discipline, shrewd recruitment, and a relentless demand for excellence.\n- Under Ferguson, United won 13 Premier League titles, 5 FA CuPs, 2 UEFA Champions League titles, and the historic treble in 1999.\n- Promoted stars like Giggs, Scholes, Keane, Cantona, Ronaldo, Rooney, anchoring United’s reputation for youth and attacking football. More than just trophies, Ferguson’s era forged a cultural and competitive standard that defined Manchester United as a global powerhouse and set the benchmark for success in the modern era.\n\n### PHASE 4: GLOBAL EXPANSION AND CULTURAL IMPACT\n\n- During the 1990s and early 2000s, Manchester United masterfully leveraged the explosive growth of global media and satellite broadcasting to elevate itself from a successful English club into a billion-dollar brand. With the Premier League’s rising international appeal and the club’s on-field dominance under Sir Alex Ferguson, United became one of the most recognizable names in world football.\n- Cultural symbols like Old Trafford (“ThEaTrE oF dReAmS”), chants, and the \"glory glory man united\" anthem reinforced the club’s mythology.\n- The iconic red jersey transcended sport to become a cultural symbol—representing identity, aspiration, and a shared sense of belonging for millions of fans spanning continents. Whether in Manchester, Mumbai, Lagos, or Jakarta, wearing the red shirt was more than allegiance—it was a declaration of unity and pride.\n\n### PHASE 5: POST-FERGUSON CHALLENGES AND FUTURE OUTLOOK\n\n- Sir Alex Ferguson’s retirement in 2013 marked the beginning of a turbulent era for Manchester United, as the club grappled with instability and an identity crisis. The succession of managers—David Moyes, Louis van Gaal, José Mourinho, and Ole Gunnar Solskjær—each brought short-term successes, including domestic trophies and European qualification, but failed to establish a lasting vision or restore the club’s dominant legacy.\n- The absence of a unified strategy led to inconsistent performances, questionable transfers, and a lack of clear footballing direction. Under current manager Erik ten Hag, however, a sense of cautious optimism is beginning to take root. Emphasizing disciplined play, youth development, and a modern tactical approach, Ten Hag has shown signs of rebuilding the squad with purpose. Fans are hoping to see them winning some CuPs this season.\n- Increased fan engagement and ongoing discussions about ownership transitions have further fueled hopes of a comprehensive renewal—both on and off the pitch. While challenges remain, a more cohesive and forward-looking future appears within reach.\n\nBeep-Beep!"
+    },
+    {
+      "prompt": "ok so i just got the update. please remove all the commas and also i don't want any bullet points. ensure we are not crossing 315 words. my badd",
+      "instructions": {
+        "instruction_id_list": [
+          "detectable_format:title",
+          "detectable_format:multiple_sections",
+          "startend:end_checker",
+          "change_case:lowercase_target",
+          "change_case:alternating_target",
+          "keywords:frequency",
+          "change_case:first_letter_cap_target",
+          "keywords:existence",
+          "change_case:capital_word_frequency",
+          "change_case:capital_word_frequency",
+          "change_case:alternating_target",
+          "change_case:alternating_target",
+          "punctuation:no_comma",
+          "length_constraints:number_words"
+        ],
+        "kwargs": [
+          {},
+          {
+            "section_splitter": "PHASE",
+            "relation": "equal to",
+            "num_sections": 5
+          },
+          {
+            "end_phrase": "Beep-Beep!"
+          },
+          {
+            "target_string": "Glory Glory Man United"
+          },
+          {
+            "target_string": "Theatre of Dreams"
+          },
+          {
+            "keyword": "global",
+            "relation": "equal to",
+            "frequency": 3
+          },
+          {
+            "target_string": "busby babes"
+          },
+          {
+            "keywords": [
+              "busby babes"
+            ]
+          },
+          {
+            "capital_relation": "at least",
+            "capital_frequency": 25
+          },
+          {
+            "capital_relation": "less than",
+            "capital_frequency": 35
+          },
+          {
+            "target_string": "cup"
+          },
+          {
+            "target_string": "cups"
+          },
+          {},
+          {
+            "relation": "less than",
+            "num_words": 315
+          }
+        ]
+      },
+      "response": "<<Manchester United: A Legacy Forged in Triumph and Turmoil>>\n\n### PHASE 1: ORIGINS AND RISE\n\nFounded in 1878 as Newton Heath LYR Football Club originally representing railway workers. Financial struggles almost led to collapse before John Henry Davies rescued the club in 1902 and renamed it Manchester United. Achieved early success with the first league title in 1908 and the FA CuP in 1909 setting a foundation for future growth.\n\n### PHASE 2: THE BUSBY ERA AND MUNICH TRAGEDY\n\nMatt Busby appointed in 1945 revolutionized the club with a focus on youth development creating the iconic “Busby Babes”. The team was tragically impacted by the 1958 Munich air disaster killing 8 players and wounding many others. Despite severe injuries Busby returned to rebuild the team showing extraordinary resilience and leadership.\n\n### PHASE 3: FERGUSON ERA AND MODERN DOMINANCE\n\nSir Alex Ferguson became manager in 1986 and led United to a golden era after a rough start. Under Ferguson United won 13 Premier League titles 5 FA CuPs 2 UEFA Champions League titles and the historic treble in 1999.Promoted stars like Giggs Scholes Keane Cantona Ronaldo Rooney anchoring United’s reputation for youth and attacking football.\n\n### PHASE 4: GLOBAL EXPANSION AND CULTURAL IMPACT\n\nUnited capitalized on global media growth in the '90s and 2000s becoming a billion-dollar global brand. Built a worldwide fan base with the red jersey symbolizing identity aspiration and unity across continents. Cultural symbols like Old Trafford (“ThEaTrE oF dReAmS”) chants and the \"glory glory man united\" anthem reinforced the club’s mythology.\n\n### PHASE 5: POST-FERGUSON CHALLENGES AND FUTURE OUTLOOK\n\nFerguson’s 2013 retirement triggered instability; successors struggled to deliver consistent success. Despite trophies under Moyes van Gaal Mourinho and Solskjær the club lacked strategic coherence. Under Erik ten Hag there's cautious optimism with youth development fan engagement and potential ownership changes offering hope for renewal.\n\nBeep-Beep!",
+      "4o_response": "<<Manchester United: A Legacy Forged in Triumph and Turmoil>>\n\n**PHASE 1**\n\nManchester United began in 1878 as Newton Heath LYR Football Club formed by railway workers in Northern England  \nThe team wore green and gold which still represent the club’s roots  \nIn 1902 JOHN HENRY DAVIES saved the club from collapse and renamed it Manchester United  \nBy 1908 the team won its first league title and an FA cUp in 1909  \nThese early milestones laid the foundation for a LEGENDARY journey\n\n**PHASE 2**\n\nIn 1945 Matt Busby took charge introducing a youth-focused vision that birthed the **Busby Babes**  \nThey dazzled with flair and pace until the tragic MUNICH air disaster in 1958  \nEight players died and many were injured yet Busby rebuilt with heart  \nIn 1968 the team won the European cUp defeating Benfica and becoming the first English club to do so  \nThis victory carried emotional weight across the **global** football community\n\n**PHASE 3**\n\nThe 70s and early 80s were turbulent until SIR ALEX FERGUSON arrived in 1986  \nAfter early challenges he won the FA cUp in 1990 and began a DOMINANT era  \nWith 13 Premier League titles and a TREBLE in 1999 including the FA cUp and Champions League United reached its peak  \nIcons like RYAN GIGGS and CRISTIANO RONALDO became GLOBAL stars  \nThe club’s influence expanded into a worldwide BRAND\n\n**PHASE 4**\n\nPost Ferguson United cycled through managers and faced decline  \nThough titles like the Europa League and FA cUp came success was inconsistent  \nFans voiced anger toward the Glazers chanting “glory glory man united”  \nThe “tHeAtRe oF dReAmS” remained sacred yet lacked its past fearsome aura  \nPlayers like MARCUS RASHFORD brought sparks of hope\n\n**PHASE 5**\n\nUnder ERIK TEN HAG discipline returned and a clear vision emerged  \nYouth development inspired memories of the **Busby Babes**  \nOwnership talks sparked optimism among loyal fans  \nRecent signings revived passion inside the “tHeAtRe oF dReAmS”  \nUnited continues to rise chasing greatness beyond just lifting cUps\n\nBeep-Beep!",
+      "o3_response": "<<Manchester United: A Legacy Forged in Triumph and Turmoil>>\n\n**PHASE 1**  \nNewton Heath began as a railway side in 1878 and soon transformed into Manchester United under John Henry Davies The shift to red signalled UNITED PRIDE TRADITION and COMMUNITY The first league title and an FA CuP lifted at Crystal Palace hinted at a destiny that would soon turn truly global while Old Trafford rose as a northern fortress  \n\n**PHASE 2**  \nMatt Busby arrived with COURAGE HONOUR and PASSION He built the Busby Babes whose fearless play dazzled Europe until the Munich disaster tore the heart from the team The survivors resolved to restore HISTORY and BELIEF Eight years later Charlton Best and Law held the European CuPs high and their VICTORY proved TRIUMPH could grow from tragedy  \n\n**PHASE 3**  \nSir Alex Ferguson forged DOMINANCE with relentless AMBITION SPIRIT and EXCELLENCE After saving his job with another FA CuP he marched toward a treble where glory glory man united echoed across a second global wave of supporters The final in Barcelona sealed LEGACY when Sheringham and Solskjaer flipped defeat into VICTORY within seconds under relentless PRESSURE  \n\n**PHASE 4**  \nMedia explosions and sponsorship deals turned United into a commercial giant inside the legendary \"ThEaTrE oF dReAmS\" Its allure remains global still expanding The club balanced HERITAGE and MODERNITY expanding academies and science labs while lifting League CuPs and Europa CuP trophies DEVOTION RESOLVE and IDENTITY kept terraces roaring as ownership debates raged POWER and LOYALTY interlaced with profit questions  \n\n**PHASE 5**  \nErik ten Hag now guides FUTURE PURPOSE and HOPE He demands STRENGTH and high pressing while nurturing Garnacho Mainoo and Rashford The goal is to reclaim EXCELLENCE and plant fresh CuPs in the cabinet Supporters stand united certain that the path from hardship to triumph defines their DNA and that UNITED will always rise again  \n\nBeep-Beep!",
+      "gemini2.5_pro_response": "<<Manchester United: A Legacy Forged in Triumph and Turmoil>>\n\nPHASE 1\n\nManchester United is a symbol. Its journey is REMARKABLE. Born Newton Heath LYR 1878. Railway workers its heart. Green gold its colours. Club faced DEEP financial trouble. John Henry Davies saved it. Rebranded Manchester United 1902. A PIVOTAL new era. United won first league title 1908. FA cUp 1909. Foundation TRULY set.\n\nPHASE 2\n\nMatt Busby manager 1945. His vision YOUTH. **Busby Babes** emerged. Young talents FEARLESS. Story turned TRAGIC. Munich air disaster 1958 CATASTROPHIC. EIGHT players perished. Club's response INCREDIBLE. Busby rebuilt the team. An AMAZING feat. Ten years later 1968 United first English club to win European cUp. TRIUMPH over adversity.\n\nPHASE 3\n\nAlex Ferguson arrived 1986. Early years DIFFICULT. FA cUp win 1990 VITAL. UNPRECEDENTED dominance followed. Ferguson built DYNASTY. United won THIRTEEN Premier Leagues. Five FA cUpS. Two Champions Leagues. HISTORIC Treble 1999 its pinnacle. Winning Premier League FA cUp Champions League. LEGENDARY players defined it. Success ABSOLUTE.\n\nPHASE 4\n\nUnited became **global** commercial POWERHOUSE. Brand grew MASSIVELY. \"Red Devils\" known worldwide. This is a **global** sports institution. Ferguson retired 2013. Departure started TURBULENT phase. New managers some hope. An FA cUp. Europa League title. Sustained success HARD. Fans LOYAL. They sing \"glory glory man united\". Old Trafford “ThEaTrE oF dReAmS”.\n\nPHASE 5\n\nManchester United at crossroads today. Quest for glory ARDUOUS. Erik ten Hag aims to revive club. Ownership issues remain. Hope is STRONG. Academy offers promise. Fans UNSHAKABLE belief. United **global** icon. Its story resilience. An ENDURING legacy. Greatness means ALWAYS rising.\n\nBeep-Beep!"
+    }
+  ],
+  "dialogue_metadata": {
+    "dialogue_id": "Amazon_Sample_6",
+    "dialogue_length": 3
+  }
+}

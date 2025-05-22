@@ -3,18 +3,7 @@ import json
 import re
 import string
 import os
-
-# from instruction_verifier import char_frequency, count_all_caps_words, count_bullet_points, count_lowercase_words, count_numbered_items, count_placeholders, word_frequency
-
-# # === Config ===
-# ipynb_path = "/Users/bobby/Downloads/Samples/Amazon_Sample_notebook_1.ipynb"
-# converted_json_path = "/Users/bobby/Downloads/Samples/converted_output.json"
-# validation_log_path = "/Users/bobby/Downloads/Samples/validation_report.json"
-
-# === Directory Paths ===
-input_dir = "/Users/bobby/Downloads/Samples/"
-output_base_dir = "/Users/bobby/Downloads/Samples_output/"
-os.makedirs(output_base_dir, exist_ok=True)
+import sys
 
 # === Notebook Conversion ===
 def get_cell_text(cell):
@@ -364,7 +353,7 @@ def validate_instruction(response, inst_type, kwargs, all_instructions=None):
 
 # === Main Validation Function ===
 def run_validation(input_json_path, output_log_path):
-    with open(input_json_path, "r") as f:
+    with open(input_json_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     dialogues = [data] if isinstance(data, dict) else data
@@ -403,7 +392,7 @@ def run_validation(input_json_path, output_log_path):
     print(f"✅ Validation complete. Log saved to: {output_log_path}")
 
 # === Driver ===
-def run_batch_processing():
+def run_batch_processing(input_dir, output_base_dir):
     ipynb_files = [f for f in os.listdir(input_dir) if f.endswith(".ipynb")]
     if not ipynb_files:
         print("No .ipynb files found in input folder.")
@@ -428,4 +417,5 @@ def run_batch_processing():
         run_validation(converted_path, validation_txt_path)
 
 if __name__ == "__main__":
-    run_batch_processing()
+    input_dir = sys.argv[1]
+    run_batch_processing(input_dir, input_dir)

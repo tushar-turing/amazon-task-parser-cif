@@ -1,0 +1,170 @@
+[
+  {
+    "dialogue_id": "Amazon_Sample_notebook_5",
+    "turn_index": 1,
+    "response_type": "response",
+    "prompt": "Could you please give me a 4-bullet sentence summary of the passage below and format your response e",
+    "results": [
+      {
+        "instruction": "detectable_format:number_bullet_lists",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_format:title",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "startend:end_checker",
+        "status": "Passed",
+        "message": "No error"
+      }
+    ]
+  },
+  {
+    "dialogue_id": "Amazon_Sample_notebook_5",
+    "turn_index": 2,
+    "response_type": "response",
+    "prompt": "okay... now lets change some formats of this, please don't use title now, also the content looks sma",
+    "results": [
+      {
+        "instruction": "detectable_format:numbered_list",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "startend:end_checker",
+        "status": "Passed",
+        "message": "No error"
+      }
+    ]
+  },
+  {
+    "dialogue_id": "Amazon_Sample_notebook_5",
+    "turn_index": 2,
+    "response_type": "nova_response",
+    "prompt": "okay... now lets change some formats of this, please don't use title now, also the content looks sma",
+    "results": [
+      {
+        "instruction": "detectable_format:numbered_list",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Failed",
+        "message": "Expected equal to 54 'a' (case-insensitive), found 40."
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Failed",
+        "message": "Expected equal to 69 'i' (case-insensitive), found 60."
+      },
+      {
+        "instruction": "startend:end_checker",
+        "status": "Failed",
+        "message": "End phrase mismatch: expected 'Thanks', but found 'requirements.'"
+      }
+    ]
+  },
+  {
+    "dialogue_id": "Amazon_Sample_notebook_5",
+    "turn_index": 2,
+    "response_type": "4o_response",
+    "prompt": "okay... now lets change some formats of this, please don't use title now, also the content looks sma",
+    "results": [
+      {
+        "instruction": "detectable_format:numbered_list",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Failed",
+        "message": "Expected equal to 54 'a' (case-insensitive), found 58."
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Failed",
+        "message": "Expected equal to 69 'i' (case-insensitive), found 97."
+      },
+      {
+        "instruction": "startend:end_checker",
+        "status": "Passed",
+        "message": "No error"
+      }
+    ]
+  },
+  {
+    "dialogue_id": "Amazon_Sample_notebook_5",
+    "turn_index": 2,
+    "response_type": "o3_response",
+    "prompt": "okay... now lets change some formats of this, please don't use title now, also the content looks sma",
+    "results": [
+      {
+        "instruction": "detectable_format:numbered_list",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "startend:end_checker",
+        "status": "Failed",
+        "message": "End phrase mismatch: expected 'Thanks', but found 'a).'"
+      }
+    ]
+  },
+  {
+    "dialogue_id": "Amazon_Sample_notebook_5",
+    "turn_index": 2,
+    "response_type": "gemini_pro_2.5_response",
+    "prompt": "okay... now lets change some formats of this, please don't use title now, also the content looks sma",
+    "results": [
+      {
+        "instruction": "detectable_format:numbered_list",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Failed",
+        "message": "Expected equal to 54 'a' (case-insensitive), found 125."
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Failed",
+        "message": "Expected equal to 69 'i' (case-insensitive), found 244."
+      },
+      {
+        "instruction": "startend:end_checker",
+        "status": "Passed",
+        "message": "No error"
+      }
+    ]
+  }
+]

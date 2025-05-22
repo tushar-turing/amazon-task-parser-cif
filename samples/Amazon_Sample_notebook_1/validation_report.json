@@ -1,0 +1,398 @@
+[
+  {
+    "dialogue_id": "Amazon_Sample_notebook_1",
+    "turn_index": 1,
+    "response_type": "response",
+    "prompt": "Generate a comprehensive system diagnostic report from the following raw log entries.  \n- Begin with",
+    "results": [
+      {
+        "instruction": "change_case:first_letter_cap_target",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_format:multiple_sections",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:existence",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:frequency",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "punctuation:no_comma",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "length_constraints:number_characters",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "startend:start_checker",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "startend:end_checker",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "startend:quotation",
+        "status": "Passed",
+        "message": "No error"
+      }
+    ]
+  },
+  {
+    "dialogue_id": "Amazon_Sample_notebook_1",
+    "turn_index": 2,
+    "response_type": "response",
+    "prompt": "Rewrite the diagnostic report above as a numbered list of exactly four items. Preserve all existing ",
+    "results": [
+      {
+        "instruction": "change_case:first_letter_cap_target",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_format:numbered_list",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:existence",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:frequency",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "punctuation:no_comma",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "length_constraints:number_characters",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "startend:start_checker",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "startend:end_checker",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "startend:quotation",
+        "status": "Passed",
+        "message": "No error"
+      }
+    ]
+  },
+  {
+    "dialogue_id": "Amazon_Sample_notebook_1",
+    "turn_index": 3,
+    "response_type": "response",
+    "prompt": "Rewrite the diagnostic report above as a document with following formatting. use exactly 8 bullet po",
+    "results": [
+      {
+        "instruction": "change_case:alternating_target",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_content:postscript",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_format:multiple_sections",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_format:number_bullet_lists",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:existence",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:forbidden_words",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "punctuation:no_comma",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "length_constraints:number_characters",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "length_constraints:number_words",
+        "status": "Passed",
+        "message": "No error"
+      }
+    ]
+  },
+  {
+    "dialogue_id": "Amazon_Sample_notebook_1",
+    "turn_index": 3,
+    "response_type": "nova_response",
+    "prompt": "Rewrite the diagnostic report above as a document with following formatting. use exactly 8 bullet po",
+    "results": [
+      {
+        "instruction": "change_case:alternating_target",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_content:postscript",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_format:multiple_sections",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_format:number_bullet_lists",
+        "status": "Failed",
+        "message": "Expected equal to 8 bullet points, found 13."
+      },
+      {
+        "instruction": "keywords:existence",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:forbidden_words",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "punctuation:no_comma",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "length_constraints:number_characters",
+        "status": "Failed",
+        "message": "Expected equal to 583 characters, found 467."
+      },
+      {
+        "instruction": "length_constraints:number_words",
+        "status": "Passed",
+        "message": "No error"
+      }
+    ]
+  },
+  {
+    "dialogue_id": "Amazon_Sample_notebook_1",
+    "turn_index": 3,
+    "response_type": "4o_response",
+    "prompt": "Rewrite the diagnostic report above as a document with following formatting. use exactly 8 bullet po",
+    "results": [
+      {
+        "instruction": "change_case:alternating_target",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_content:postscript",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_format:multiple_sections",
+        "status": "Failed",
+        "message": "Expected equal to 4 sections, found 0."
+      },
+      {
+        "instruction": "detectable_format:number_bullet_lists",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:existence",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:forbidden_words",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "punctuation:no_comma",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "length_constraints:number_characters",
+        "status": "Failed",
+        "message": "Expected equal to 583 characters, found 739."
+      },
+      {
+        "instruction": "length_constraints:number_words",
+        "status": "Passed",
+        "message": "No error"
+      }
+    ]
+  },
+  {
+    "dialogue_id": "Amazon_Sample_notebook_1",
+    "turn_index": 3,
+    "response_type": "o3_response",
+    "prompt": "Rewrite the diagnostic report above as a document with following formatting. use exactly 8 bullet po",
+    "results": [
+      {
+        "instruction": "change_case:alternating_target",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_content:postscript",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_format:multiple_sections",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_format:number_bullet_lists",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:existence",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:forbidden_words",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "punctuation:no_comma",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "length_constraints:number_characters",
+        "status": "Failed",
+        "message": "Expected equal to 583 characters, found 585."
+      },
+      {
+        "instruction": "length_constraints:number_words",
+        "status": "Passed",
+        "message": "No error"
+      }
+    ]
+  },
+  {
+    "dialogue_id": "Amazon_Sample_notebook_1",
+    "turn_index": 3,
+    "response_type": "gemini_pro_2.5_response",
+    "prompt": "Rewrite the diagnostic report above as a document with following formatting. use exactly 8 bullet po",
+    "results": [
+      {
+        "instruction": "change_case:alternating_target",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_content:postscript",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "detectable_format:multiple_sections",
+        "status": "Failed",
+        "message": "Expected equal to 4 sections, found 0."
+      },
+      {
+        "instruction": "detectable_format:number_bullet_lists",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:existence",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:forbidden_words",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "keywords:letter_frequency",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "punctuation:no_comma",
+        "status": "Passed",
+        "message": "No error"
+      },
+      {
+        "instruction": "length_constraints:number_characters",
+        "status": "Failed",
+        "message": "Expected equal to 583 characters, found 562."
+      },
+      {
+        "instruction": "length_constraints:number_words",
+        "status": "Passed",
+        "message": "No error"
+      }
+    ]
+  }
+]

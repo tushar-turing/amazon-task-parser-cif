@@ -70,6 +70,81 @@ def process_notebook(file_path, dialogue_id=None):
             current_turn[f"{k}_response"] = v
         turns.append(current_turn)
 
+    # Map of expected kwargs for each instruction ID
+    EXPECTED_ARGUMENTS = {
+        "change_case:all_caps": [],
+        "change_case:lowercase": [],
+        "change_case:alternating": [],
+        "change_case:first_letter_cap": [],
+        "change_case:capital_word_frequency": ["capital_relation", "capital_frequency"],
+        "change_case:lowercase_word_frequency": ["lowercase_relation", "lowercase_frequency"],
+        "change_case:all_caps_target": ["target_string"],
+        "change_case:lowercase_target": ["target_string"],
+        "change_case:alternating_target": ["target_string"],
+        "change_case:first_letter_cap_target": ["target_string"],
+        "detectable_content:number_placeholders": ["relation", "num_placeholders"],
+        "detectable_content:postscript": ["postscript_marker"],
+        "detectable_format:json_format": [],
+        "detectable_format:multiple_sections": ["section_splitter", "relation", "num_sections"],
+        "detectable_format:numbered_list": ["relation", "num_numbered_items"],
+        "detectable_format:number_bullet_lists": ["relation", "num_bullets"],
+        "detectable_format:title": [],
+        "keywords:existence": ["keywords"],
+        "keywords:frequency": ["keyword", "relation", "frequency"],
+        "keywords:forbidden_words": ["forbidden_words"],
+        "keywords:letter_frequency": ["letter", "let_relation", "let_frequency"],
+        "punctuation:no_comma": [],
+        "length_constraints:number_characters": ["relation", "num_chars"],
+        "length_constraints:number_words": ["relation", "num_words"],
+        "length:max_word_count": ["max_words"],
+        "startend:start_checker": ["start_phrase"],
+        "startend:end_checker": ["end_phrase"],
+        "startend:wrap_checker": ["wrap_phrase"],
+        "startend:quotation": []
+    }
+
+    def validate_instruction_schema(instructions):
+        mismatches = []
+        ids = instructions.get("instruction_id_list", [])
+        kwargs_list = instructions.get("kwargs", [])
+
+        for i, inst in enumerate(ids):
+            expected_args = set(EXPECTED_ARGUMENTS.get(inst, []))
+            actual_args = set(kwargs_list[i].keys()) if i < len(kwargs_list) else set()
+
+            if expected_args != actual_args:
+                mismatches.append({
+                    "instruction": inst,
+                    "expected_args": sorted(expected_args),
+                    "actual_args": sorted(actual_args)
+                })
+
+        return mismatches
+
+    # === Instruction schema check ===
+    all_mismatches = []
+
+    for turn_index, turn in enumerate(turns):
+        if "instructions" in turn:
+            mismatches = validate_instruction_schema(turn["instructions"])
+            if mismatches:
+                all_mismatches.append({
+                    "turn_index": turn_index + 1,
+                    "prompt": turn['prompt'][:10],
+                    "mismatches": mismatches
+                })
+
+    if all_mismatches:
+        print(f"\n❌ Instruction schema mismatches found in the notebook:")
+        for entry in all_mismatches:
+            print(f"\n📌 Turn {entry['turn_index']}: {entry['prompt']}...")
+            for m in entry['mismatches']:
+                print(f"- Instruction: {m['instruction']}")
+                print(f"  Expected: {m['expected_args']}")
+                print(f"  Found:    {m['actual_args']}")
+    else:
+        print("✅ Instruction IDs and kwargs are valid for all turns.")
+
     return {
         "turns": turns,
         "dialogue_metadata": {
@@ -227,12 +302,14 @@ def validate_instruction(response, inst_type, kwargs, all_instructions=None):
             return (not missing, "No error" if not missing else f"Missing keyword(s): {missing}")
 
         if inst_type == "keywords:frequency":
-            keyword = kwargs["keyword"].lower()
-            words = re.findall(r'\b\w+\b', response.lower())  # case-insensitive, word-split
-            count = sum(1 for w in words if w == keyword)
+            keyword = kwargs["keyword"].strip().lower()
+            matches = re.findall(rf'\b{re.escape(keyword)}\b', response, flags=re.IGNORECASE)
+            count = len(matches)
 
-            rel, val = kwargs["relation"], kwargs["frequency"]
+            rel = kwargs["relation"]
+            val = kwargs["frequency"]
             valid = eval(f"{count} {'>=' if rel == 'at least' else '==' if rel == 'equal to' else '<'} {val}")
+            
             return (
                 valid,
                 "No error" if valid else f"Expected {rel} {val} of '{keyword}', found {count}."
@@ -282,8 +359,6 @@ def validate_instruction(response, inst_type, kwargs, all_instructions=None):
             # Get the last few words from the response, based on required length
             actual_words = response.strip().split()[-len(required.split()):]
             actual_phrase = " ".join(actual_words).strip().strip('"')
-
-            # Optional debug: print("Required:", required, "Actual:", actual_phrase)
 
             # Compare full phrase (with punctuation)
             if actual_phrase != required:

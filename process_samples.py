@@ -4,6 +4,7 @@ import re
 import string
 import os
 import sys
+from collections import defaultdict
 
 # === Notebook Conversion ===
 def get_cell_text(cell):

@@ -69,7 +69,23 @@ def show_batch_processing():
 
 def show_single_cell_validation():
     st.header("Single Cell Validation")
-    st.markdown("Validate a single cell's assistant response and instructions.")
+    st.markdown("""
+    Validate a single cell's assistant response and instructions.
+    
+    The instructions should follow this JSON schema:
+    ```json
+    {
+      "metadata": ["add"],
+      "instructions": [
+        {
+          "instruction_id": "",
+          "kwarg1_name": "kwarg1_value",
+          "kwarg2_name": "kwarg2_value"
+        }
+      ]
+    }
+    ```
+    """)
 
     # Input for Assistant Response
     assistant_response = st.text_area(
@@ -82,7 +98,7 @@ def show_single_cell_validation():
     instructions_json = st.text_area(
         "Instructions JSON",
         height=200,
-        help="Paste the instructions JSON containing instruction IDs and kwargs"
+        help="Paste the instructions JSON following the schema above"
     )
 
     if st.button("Validate Cell"):
@@ -94,13 +110,38 @@ def show_single_cell_validation():
             try:
                 # Parse instructions JSON
                 instructions = json.loads(instructions_json)
-                ids = instructions.get("instruction_id_list", [])
-                kwargs_list = instructions.get("kwargs", [])
+                
+                # Validate schema
+                if not isinstance(instructions, dict):
+                    st.error("Instructions must be a JSON object")
+                    return
+                    
+                if "metadata" not in instructions or "instructions" not in instructions:
+                    st.error("Instructions must contain 'metadata' and 'instructions' fields")
+                    return
+                    
+                if not isinstance(instructions["metadata"], list):
+                    st.error("'metadata' must be a list")
+                    return
+                    
+                if not isinstance(instructions["instructions"], list):
+                    st.error("'instructions' must be a list")
+                    return
+                    
+                for instruction in instructions["instructions"]:
+                    if not isinstance(instruction, dict):
+                        st.error("Each instruction must be an object")
+                        return
+                    if "instruction_id" not in instruction:
+                        st.error("Each instruction must have an 'instruction_id' field")
+                        return
 
                 # Validate each instruction
                 results = []
-                for i, inst_id in enumerate(ids):
-                    kwargs = kwargs_list[i]
+                for instruction in instructions["instructions"]:
+                    inst_id = instruction["instruction_id"]
+                    # Remove instruction_id from kwargs
+                    kwargs = {k: v for k, v in instruction.items() if k != "instruction_id"}
                     valid, message = validate_instruction(assistant_response, inst_id, kwargs, instructions)
                     results.append({
                         "instruction": inst_id,
@@ -115,8 +156,8 @@ def show_single_cell_validation():
                     "results": results
                 })
 
-            except json.JSONDecodeError:
-                st.error("Invalid JSON format in Instructions JSON")
+            except json.JSONDecodeError as e:
+                st.error(f"Invalid JSON format: {str(e)}")
             except Exception as e:
                 st.error(f"Error during validation: {str(e)}")
 

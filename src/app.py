@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 from main import run_validation, run_batch_processing
+from validators.validator import validate_instruction
 
 st.set_page_config(
     page_title="Turing Amazon Task Parser VIF",
@@ -17,10 +18,12 @@ def main():
 
     # Sidebar
     st.sidebar.header("Navigation")
-    page = st.sidebar.radio("Choose a page", ["Notebook Processing and Validation"])
+    page = st.sidebar.radio("Choose a page", ["Notebook Processing and Validation", "Single Cell Validation"])
 
     if page == "Notebook Processing and Validation":
         show_batch_processing()
+    else:
+        show_single_cell_validation()
 
 def show_batch_processing():
     st.header("Notebook Processing and Validation")
@@ -63,5 +66,59 @@ def show_batch_processing():
                                 with open(validation_path, 'r', encoding='utf-8') as f:
                                     validation_data = json.load(f)
                                 st.json(validation_data)
+
+def show_single_cell_validation():
+    st.header("Single Cell Validation")
+    st.markdown("Validate a single cell's assistant response and instructions.")
+
+    # Input for Assistant Response
+    assistant_response = st.text_area(
+        "Assistant Response",
+        height=200,
+        help="Paste the assistant's response text here"
+    )
+
+    # Input for Instructions JSON
+    instructions_json = st.text_area(
+        "Instructions JSON",
+        height=200,
+        help="Paste the instructions JSON containing instruction IDs and kwargs"
+    )
+
+    if st.button("Validate Cell"):
+        if not assistant_response or not instructions_json:
+            st.error("Please provide both Assistant Response and Instructions JSON")
+            return
+
+        with st.spinner("Validating cell..."):
+            try:
+                # Parse instructions JSON
+                instructions = json.loads(instructions_json)
+                ids = instructions.get("instruction_id_list", [])
+                kwargs_list = instructions.get("kwargs", [])
+
+                # Validate each instruction
+                results = []
+                for i, inst_id in enumerate(ids):
+                    kwargs = kwargs_list[i]
+                    valid, message = validate_instruction(assistant_response, inst_id, kwargs, instructions)
+                    results.append({
+                        "instruction": inst_id,
+                        "status": "Passed" if valid else "Failed",
+                        "message": message
+                    })
+
+                # Display results
+                st.success("Validation complete!")
+                st.json({
+                    "response": assistant_response[:100] + "..." if len(assistant_response) > 100 else assistant_response,
+                    "results": results
+                })
+
+            except json.JSONDecodeError:
+                st.error("Invalid JSON format in Instructions JSON")
+            except Exception as e:
+                st.error(f"Error during validation: {str(e)}")
+
 if __name__ == "__main__":
     main() 

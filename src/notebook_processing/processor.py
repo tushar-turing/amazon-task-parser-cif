@@ -38,8 +38,8 @@ def process_notebook(file_path: str, dialogue_id: Optional[str] = None) -> Dict:
             {
                 "prompt": str,
                 "instructions": {
-                    "instruction_id_list": List[str],
-                    "kwargs": Dict[str, Any]
+                    "metadata": List[str],
+                    "instructions": List[Dict]
                 },
                 "response": str,
                 "response_type": str,
@@ -59,7 +59,8 @@ def process_notebook(file_path: str, dialogue_id: Optional[str] = None) -> Dict:
     current_turn = {}
     assistant_models = {}
 
-    for cell in nb['cells']:
+    # Skip the first cell
+    for cell in nb['cells'][1:]:
         if cell['cell_type'] != 'markdown':
             continue
         cell_text = get_cell_text(cell)
@@ -79,8 +80,8 @@ def process_notebook(file_path: str, dialogue_id: Optional[str] = None) -> Dict:
         elif tag_type == "metadata":
             instruction_data = extract_json_from_metadata_cell(cell_text)
             current_turn["instructions"] = {
-                "instruction_id_list": instruction_data.get("instruction_id_list", []),
-                "kwargs": instruction_data.get("kwargs", [])
+                "metadata": instruction_data.get("metadata", []),
+                "instructions": instruction_data.get("instructions", [])
             }
         elif tag_type == "assistant":
             current_turn["response"] = content

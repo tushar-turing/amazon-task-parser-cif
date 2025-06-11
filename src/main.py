@@ -16,14 +16,17 @@ def run_validation(input_json_path: str, output_log_path: str) -> None:
         dialogue_id = dialogue.get("dialogue_metadata", {}).get("dialogue_id", f"dialogue_{d_index}")
         for t_index, turn in enumerate(dialogue["turns"]):
             instructions = turn.get("instructions", {})
-            ids = instructions.get("instruction_id_list", [])
-            kwargs_list = instructions.get("kwargs", [])
+            instruction_list = instructions.get("instructions", [])
             all_responses = {k: v for k, v in turn.items() if k.endswith("_response") or k == "response"}
 
             for label, response in all_responses.items():
                 turn_results = []
-                for i, inst_id in enumerate(ids):
-                    kwargs = kwargs_list[i]
+                for inst in instruction_list:
+                    inst_id = inst.get("instruction_id")
+                    if not inst_id:
+                        continue
+                    # Get all kwargs except instruction_id
+                    kwargs = {k: v for k, v in inst.items() if k != "instruction_id"}
                     valid, message = validate_instruction(response, inst_id, kwargs, instructions)
                     turn_results.append({
                         "instruction": inst_id,

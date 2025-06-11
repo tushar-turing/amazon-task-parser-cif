@@ -260,16 +260,51 @@ def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], 
 def validate_instruction_schema(instructions: Dict) -> List[Dict]:
     """Validate the schema of instructions against expected arguments."""
     mismatches = []
-    ids = instructions.get("instruction_id_list", [])
-    kwargs_list = instructions.get("kwargs", [])
+    
+    # Validate metadata field
+    metadata = instructions.get("metadata", [])
+    if not isinstance(metadata, list):
+        mismatches.append({
+            "field": "metadata",
+            "expected": "list",
+            "actual": type(metadata).__name__
+        })
+    
+    # Validate instructions array
+    instructions_list = instructions.get("instructions", [])
+    if not isinstance(instructions_list, list):
+        mismatches.append({
+            "field": "instructions",
+            "expected": "list",
+            "actual": type(instructions_list).__name__
+        })
+        return mismatches
 
-    for i, inst in enumerate(ids):
-        expected_args = set(EXPECTED_ARGUMENTS.get(inst, []))
-        actual_args = set(kwargs_list[i].keys()) if i < len(kwargs_list) else set()
+    # Validate each instruction object
+    for i, inst in enumerate(instructions_list):
+        if not isinstance(inst, dict):
+            mismatches.append({
+                "instruction_index": i,
+                "expected": "dict",
+                "actual": type(inst).__name__
+            })
+            continue
+
+        # Check for required instruction_id field
+        if "instruction_id" not in inst:
+            mismatches.append({
+                "instruction_index": i,
+                "missing_field": "instruction_id"
+            })
+            continue
+
+        # Validate kwargs against expected arguments
+        expected_args = set(EXPECTED_ARGUMENTS.get(inst["instruction_id"], []))
+        actual_args = set(k for k in inst.keys() if k != "instruction_id")
 
         if expected_args != actual_args:
             mismatches.append({
-                "instruction": inst,
+                "instruction": inst["instruction_id"],
                 "expected_args": sorted(expected_args),
                 "actual_args": sorted(actual_args)
             })

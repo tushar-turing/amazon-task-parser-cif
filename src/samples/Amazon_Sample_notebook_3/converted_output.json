@@ -1,0 +1,121 @@
+{
+  "turns": [
+    {
+      "prompt": "Generate a quarterly marketing email report summary in valid JSON wrapped in ``` on either side. Begin with Email Begin: and end with Email End.  \n• Under the key “Highlights” include exactly five points  \n• Use the word “IMPORTANT” exactly once in all caps  \n• Include a “P.S.” field with a short note  \n• Mention ROI, conversion, and engagement each at least once  \n• Use campaign at least three times  \n• Ensure the letter C appears exactly 7 times  \n• Do not use the words delay or issue    \n• Total word count must be under 200\n\n```csv\nCampaign,Impressions,Clicks,CTR (%),Conversions,Conv Rate (%),Spend ($),CPC ($),Revenue ($),ROI (%),Engagement Score\nSpring_Sale,120000,4800,4.0,320,6.7,15000,3.12,45000,200,82\nNew_Product_Launch,95000,3800,4.0,290,7.6,12500,3.29,36000,188,75\nSummer_Promo,110000,5100,4.6,410,8.0,18000,3.53,55000,206,88\nHoliday_Countdown,130000,6500,5.0,580,8.9,20000,3.08,70000,250,90\nLoyalty_ThankYou,80000,3200,4.0,260,8.1,10000,3.13,30000,200,80\n```",
+      "instructions": {
+        "instruction_id_list": [
+          "startend:start_checker",
+          "startend:end_checker",
+          "detectable_format:json_format",
+          "keywords:frequency",
+          "keywords:frequency",
+          "keywords:letter_frequency",
+          "keywords:forbidden_words",
+          "length_constraints:number_words",
+          "detectable_content:postscript"
+        ],
+        "kwargs": [
+          {
+            "start_phrase": "Email Begin:"
+          },
+          {
+            "end_phrase": "Email End."
+          },
+          {
+            "keyword": "IMPORTANT",
+            "relation": "equal to",
+            "frequency": 1
+          },
+          {
+            "keyword": "ROI",
+            "relation": "at least",
+            "frequency": 1
+          },
+          {
+            "keyword": "conversion",
+            "relation": "at least",
+            "frequency": 1
+          },
+          {
+            "keyword": "engagement",
+            "relation": "at least",
+            "frequency": 1
+          },
+          {
+            "keyword": "campaign",
+            "relation": "at least",
+            "frequency": 3
+          },
+          {
+            "letter": "C",
+            "let_relation": "equal to",
+            "let_frequency": 7
+          },
+          {
+            "forbidden_words": [
+              "delay",
+              "issue"
+            ]
+          },
+          {
+            "relation": "less than",
+            "num_words": 200
+          },
+          {
+            "postscript_marker": "P.S."
+          }
+        ]
+      },
+      "response": "Email Begin:\n\n```json\n{\n  \"Subject\": \"Quarterly Campaign Report Summary\",\n  \"Highlights\": [\n    \"Holiday Countdown campaign achieved the highest ROI at 250 percent\",\n    \"Summer Promo campaign led in conversions with 410 total\",\n    \"Loyalty ThankYou campaign saw strong engagement scoring 80\",\n    \"Holiday Countdown campaign had the lowest CPC improving cost control\",\n    \"Holiday_Countdown also scored the top engagement at 90\"\n  ],\n  \"Summary\": \"This quarter featured five core campaigns each contributing to growth in ROI conversion and engagement. The Holiday Countdown stood out with top conversion and engagement metrics. Summer Promo continued to strengthen performance while maintaining budget efficiency. Spring Sale controlled spend effectively. Each campaign showed characteristic strengths enhancing our collective impact. \"IMPORTANT\" metrics were reviewed to support upcoming strategic shifts. Campaign consistency and communication will be key moving forward.\",\n  \"P.S.\": \"Thanks for helping our campaigns connect with customers more effectively.\"\n}\n```\nEmail End."
+    },
+    {
+      "prompt": "Classification Begin:\nUsing the CSV data, sort each campaign into one of three ROI tiers—High ROI (≥220%), Medium ROI (180%–219%), Low ROI (< 180%). Produce exactly three numbered sections titled “High ROI,” “Medium ROI,” and “Low ROI,” (with quotes) listing campaign names alongside their ROI values. Mention ROI exactly 13 times. Do not use delay or issue. End with Classification End. Keep the entire output under 150 words.",
+      "instructions": {
+        "instruction_id_list": [
+          "startend:end_checker",
+          "detectable_format:numbered_list",
+          "keywords:frequency",
+          "keywords:forbidden_words",
+          "length_constraints:number_words"
+        ],
+        "kwargs": [
+          {
+            "end_phrase": "Classification End."
+          },
+          {
+            "relation": "equal to",
+            "num_numbered_items": 3
+          },
+          {
+            "keyword": "ROI",
+            "relation": "equal to",
+            "frequency": 13
+          },
+          {
+            "forbidden_words": [
+              "delay",
+              "issue"
+            ]
+          },
+          {
+            "relation": "less than",
+            "num_words": 150
+          }
+        ]
+      },
+      "response": "1. \"High ROI\"\n\n* Holiday_Countdown: ROI 250\n\n\n2. \"Medium ROI\"\n\n* Spring_Sale: ROI 200\n* Loyalty_ThankYou: ROI 200\n* New_Product_Launch: ROI 188\n* Summer_Promo: ROI 206\n\n3. \"Low ROI\"\n\n* (No campaigns in this tier)\n\nThis quarter’s campaign ROI classification highlights how strategic alignment drives results. Holiday\\_Countdown leads with top-tier ROI while Summer\\_Promo also exceeded the 200 mark. The Medium ROI tier reflects consistent campaign contributions with values just below the high threshold. No campaign fell into the Low ROI category this time which confirms strong cross-channel performance. Overall ROI analysis shows focused execution with measurable gains.\n\nClassification End.",
+      "nova_response": "Classification Begin:\n\nHere are the campaigns sorted by ROI tiers:\n\n1. **High ROI (≥220%)**\n   - Holiday_Countdown: 250% ROI\n\n2. **Medium ROI (180%–219%)**\n   - Spring_Sale: 200% ROI\n   - New_Product_Launch: 188% ROI\n   - Summer_Promo: 206% ROI\n   - Loyalty_ThankYou: 200% ROI\n\n3. **Low ROI (< 180%)**\n   - No campaigns fall into this category.\n\nAll campaigns achieved at least Medium ROI, with Holiday_Countdown excelling in the High ROI category. ROI was a critical metric for evaluating each campaign's success. The consistent ROI performance across all campaigns highlights effective strategies.\n\nClassification End.",
+      "4o_response": "Classification Begin:\n**High ROI**\n\n* Holiday\\_Countdown: ROI 250\n* Loyalty\\_ThankYou: ROI 200\n\n**Medium ROI**\n\n* Summer\\_Promo: ROI 206\n* New\\_Product\\_Launch: ROI 188\n\n**Low ROI**\n\n* Spring\\_Sale: ROI 200\n\nThese campaigns reflect a healthy return overall. The top performers are clearly leading while others need some improvement. ROI can guide future direction effectively.\n\nClassification End.",
+      "o4-mini-high_response": "Classification Begin:\n\n1. “High ROI,”\n\n* Holiday\\_Countdown: ROI 250% (ROI)\n\n2. “Medium ROI,”\n\n* Spring\\_Sale: ROI 200% (ROI)\n* New\\_Product\\_Launch: ROI 188% (ROI)\n* Summer\\_Promo: ROI 206% (ROI)\n* Loyalty\\_ThankYou: ROI 200% (ROI)\n\n3. “Low ROI,”\n\n* None\n  Classification End",
+      "o3_response": "Classification Begin:\n\n1. \"High ROI\": Holiday\\_Countdown – ROI 250% (ROI high)\n2. \"Medium ROI\": Spring\\_Sale – ROI 200% (ROI mid), New\\_Product\\_Launch – ROI 188% (ROI mid), Summer\\_Promo – ROI 206% (ROI mid), Loyalty\\_ThankYou – ROI 200%\n3. \"Low ROI\": None (ROI n/a)\n   Classification End",
+      "gemini_pro_2.5_response": "Classification Begin:\nHere is the ROI classification. This analysis sorts campaigns by their ROI tier. Understanding each campaign's ROI helps. The ROI levels reviewed:\n\n1. \"High ROI\"\nHoliday_Countdown: 250% ROI. Achieved top ROI.\n\n2. \"Medium ROI\"\nSpring_Sale: 200% ROI\nNew_Product_Launch: 188% ROI\nSummer_Promo: 206% ROI\nLoyalty_ThankYou: 200% ROI. Solid ROI results here.\n\n3. \"Low ROI\"\nNo campaigns in this ROI tier this period.\n\nOverall ROI reflects positive outcomes.\nClassification End",
+      "claude_sonnet_3.7_response": "Classification Begin:\n\n1. \"High ROI\" Campaigns:\n   - Holiday_Countdown: 250% ROI\n   This campaign achieved the highest ROI performance among all marketing initiatives, exceeding our threshold for premium ROI results by a significant margin.\n\n2. \"Medium ROI\" Campaigns:\n   - Summer_Promo: 206% ROI\n   - Spring_Sale: 200% ROI\n   - Loyalty_ThankYou: 200% ROI\n   These campaigns delivered solid ROI performance within our target range, demonstrating consistent returns on marketing investment. Each campaign's ROI falls within our established parameters for successful marketing initiatives.\n\n3. \"Low ROI\" Campaigns:\n   - New_Product_Launch: 188% ROI\n   While this campaign's ROI falls below our medium threshold, it still provided positive returns that contributed to overall marketing success. The ROI for this campaign suggests potential for optimization in future iterations.\n\nThe ROI analysis indicates 80% of our campaigns achieved medium or high ROI levels, with only one campaign in the lower ROI category. This ROI distribution demonstrates effective marketing strategy implementation across most campaigns.\n\nClassification End.",
+      "mistral_response": "Classification Begin:\n1. \"High ROI\": None of the campaigns achieved an ROI of 220% or higher.\n2. \"Medium ROI\": Holiday Countdown (250% ROI), Summer Promo (206% ROI).\n3. \"Low ROI\": Spring Sale (200% ROI), New Product Launch (188% ROI), Loyalty ThankYou (200% ROI).\n\nThe Holiday Countdown campaign led with the highest ROI at 250%. The Summer Promo campaign also performed well with a 206% ROI. The Spring Sale, New Product Launch, and Loyalty ThankYou campaigns fell into the Low ROI category. Overall, the ROI values indicate varied performance across the campaigns. Classification End.",
+      "gemini_2.0_flash_response": "Classification Begin:\n1. \"High ROI\"\n   - Holiday_Countdown (ROI: 250%)\n   - Summer_Promo (ROI: 206%)\n   - Spring_Sale (ROI: 200%)\n   - Loyalty_ThankYou (ROI: 200%)\n   The ROI for these campaigns indicates strong performance.\n\n2. \"Medium ROI\"\n   - New_Product_Launch (ROI: 188%)\n   This campaign's ROI falls within the medium tier.\n\n3. \"Low ROI\"\n   No campaigns fall into the Low ROI tier based on their ROI. All campaigns achieved an ROI greater than 180%. The overall ROI across campaigns is commendable. Each campaign's ROI contributes to the positive marketing outcomes. Analyzing the ROI of each campaign helps in future planning. Monitoring ROI is a crucial aspect of campaign management. Understanding the drivers of ROI is essential. The reported ROI figures are encouraging.\nClassification End."
+    }
+  ],
+  "dialogue_metadata": {
+    "dialogue_id": "Amazon_Sample_notebook_3",
+    "dialogue_length": 2
+  }
+}

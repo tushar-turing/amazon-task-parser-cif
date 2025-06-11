@@ -5,6 +5,7 @@ This directory contains the main source code for the Turing Amazon Task Parser V
 ## Directory Structure
 
 - `main.py`: The main entry point of the application that handles batch processing of notebooks and validation
+- `app.py`: Streamlit web interface for the application
 - `requirements.txt`: Python package dependencies
 - `validators/`: Contains validation logic for instructions and responses
   - `validator.py`: Core validation functions and schema definitions
@@ -19,6 +20,18 @@ This directory contains the main source code for the Turing Amazon Task Parser V
 - Converts notebooks to JSON format
 - Runs validation on the converted output
 - Generates validation reports
+
+### Streamlit Interface (`app.py`)
+
+- Provides a user-friendly web interface
+- Supports batch processing of multiple notebooks
+- Allows single file validation
+- Displays results in an interactive format
+- Features:
+  - File upload interface
+  - Progress indicators
+  - JSON result viewer
+  - Error handling and reporting
 
 ### Validators
 
@@ -40,6 +53,8 @@ The notebook processing system:
 
 ## Usage
 
+### Command Line
+
 The main script can be run from the command line:
 
 ```bash
@@ -47,3 +62,17 @@ python main.py <input_directory>
 ```
 
 Where `<input_directory>` should contain the Jupyter notebook files to be processed.
+
+### Web Interface
+
+To run the Streamlit interface:
+
+```bash
+streamlit run app.py
+```
+
+This will start a local web server and open the interface in your default browser. You can then:
+
+1. Upload Jupyter notebooks for batch processing
+2. Upload individual JSON files for validation
+3. View results in an interactive format

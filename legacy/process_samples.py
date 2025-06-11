@@ -6,7 +6,6 @@ import os
 import sys
 from collections import defaultdict
 
-# === Notebook Conversion ===
 def get_cell_text(cell):
     return ''.join(cell['source']) if isinstance(cell['source'], list) else cell['source']
 

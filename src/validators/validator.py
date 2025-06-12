@@ -234,13 +234,30 @@ def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], 
 
         if inst_type == "startend:end_checker":
             required = kwargs["end_phrase"].strip()
-            actual_words = response.strip().split()[-len(required.split()):]
-            actual_phrase = " ".join(actual_words).strip().strip('"')
-            if actual_phrase != required:
-                return (
-                    False,
-                    f"End phrase mismatch: expected '{required}', but found '{actual_phrase}'"
-                )
+            # Check if required phrase ends with punctuation
+            ends_with_punctuation = required[-1] in string.punctuation if required else False
+            
+            # Get the actual end of the response
+            actual_words = response.lstrip(string.punctuation).strip().split()
+            if not actual_words:
+                return (False, "Empty response")
+                
+            # If required phrase ends with punctuation, we need exact match
+            if ends_with_punctuation:
+                actual_phrase = " ".join(actual_words[-len(required.split()):])
+                if actual_phrase != required:
+                    return (
+                        False,
+                        f"End phrase mismatch: expected '{required}', but found '{actual_phrase}'"
+                    )
+            else:
+                # If no punctuation, strip trailing punctuation and whitespace
+                actual_phrase = " ".join(actual_words).rstrip(string.punctuation + " ")[-len(required):]
+                if actual_phrase != required:
+                    return (
+                        False,
+                        f"End phrase mismatch: expected '{required}', but found '{actual_phrase}'"
+                    )
             return (True, "No error")
 
         if inst_type == "startend:wrap_checker":

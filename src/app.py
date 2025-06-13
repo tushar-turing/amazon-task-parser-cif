@@ -49,7 +49,7 @@ def main():
     st.title("Turing Amazon Task Parser VIF")
     st.markdown("Process and validate Jupyter notebooks containing Turing Amazon task data.")
     # Tabs
-    tab1, tab2, tab3, tab4 = st.tabs([
+    tab2, tab1, tab3, tab4 = st.tabs([
         "Validation (Single Turn)",
         "Validation (Batch/Notebook)",
         "Nova (Single Turn)",

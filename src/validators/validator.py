@@ -226,7 +226,7 @@ def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], 
             return (valid, "No error" if valid else f"Expected {rel} {val} words, found {count}.")
 
         if inst_type == "startend:start_checker":
-            starts_correctly = response.lstrip(string.punctuation + " ").startswith(kwargs.get("start_phrase", ""))
+            starts_correctly = response.lstrip(string.punctuation + " ").lower().startswith(kwargs.get("start_phrase", "").lower())
             return (
                 starts_correctly,
                 "No error" if starts_correctly else "Response does not start with required phrase."
@@ -245,7 +245,7 @@ def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], 
             # If required phrase ends with punctuation, we need exact match
             if ends_with_punctuation:
                 actual_phrase = " ".join(actual_words[-len(required.split()):])
-                if actual_phrase != required:
+                if actual_phrase.lower() != required.lower():
                     return (
                         False,
                         f"End phrase mismatch: expected '{required}', but found '{actual_phrase}'"
@@ -253,7 +253,7 @@ def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], 
             else:
                 # If no punctuation, strip trailing punctuation and whitespace
                 actual_phrase = " ".join(actual_words).rstrip(string.punctuation + " ")[-len(required):]
-                if actual_phrase != required:
+                if actual_phrase.lower() != required.lower():
                     return (
                         False,
                         f"End phrase mismatch: expected '{required}', but found '{actual_phrase}'"

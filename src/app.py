@@ -183,7 +183,7 @@ def show_single_cell_validation():
                     
                 contradiction_errors = check_contradicting_instructions(instructions["instructions"])
                 if contradiction_errors:
-                    st.error("Contradicting instructions found: " + "\n".join(contradiction_errors))
+                    st.error("Contradicting instructions found: " + str(contradiction_errors))
                     return
 
                 # Validate each instruction

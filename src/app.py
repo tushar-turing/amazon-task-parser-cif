@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 from main import run_validation, run_batch_processing
-from validators.validator import validate_instruction
+from validators.validator import validate_instruction, check_contradicting_instructions, CONTRADICTING_PAIRS
 import requests
 
 st.set_page_config(
@@ -146,7 +146,7 @@ def show_single_cell_validation():
         key="2"
     )
 
-    if st.button("Validate Cell"):
+    if st.button("Validate Cell", type="primary"):
         if not assistant_response or not instructions_json:
             st.error("Please provide both Assistant Response and Instructions JSON")
             return
@@ -180,6 +180,11 @@ def show_single_cell_validation():
                     if "instruction_id" not in instruction:
                         st.error("Each instruction must have an 'instruction_id' field")
                         return
+                    
+                contradiction_errors = check_contradicting_instructions(instructions["instructions"])
+                if contradiction_errors:
+                    st.error("Contradicting instructions found: " + str(instructions["instructions"]))
+                    return
 
                 # Validate each instruction
                 results = []
@@ -205,6 +210,18 @@ def show_single_cell_validation():
                 st.error(f"Invalid JSON format: {str(e)}")
             except Exception as e:
                 st.error(f"Error during validation: {str(e)}")
+
+    # Add button to show contradicting pairs
+    if st.button("Show Contradicting Instruction Pairs"):
+        pairs = []
+        for pair in CONTRADICTING_PAIRS:
+            pair_list = list(pair)
+            if len(pair_list) == 2:
+                pairs.append({"Instruction 1": pair_list[0], "Instruction 2": pair_list[1]})
+            elif len(pair_list) == 1:
+                pairs.append({"Instruction 1": pair_list[0], "Instruction 2": ""})
+        st.markdown("#### Contradicting Instruction Pairs")
+        st.table(pairs)
 
 def show_nova_single_turn():
     st.header("Nova Model: Single Turn Test & Validation")

@@ -36,6 +36,24 @@ EXPECTED_ARGUMENTS = {
     "startend:quotation": []
 }
 
+# Common-sense contradicting instruction pairs (unordered)
+CONTRADICTING_PAIRS = {
+    frozenset(["change_case:all_caps", "change_case:lowercase"]),
+    frozenset(["change_case:all_caps", "change_case:alternating"]),
+    frozenset(["change_case:all_caps", "change_case:first_letter_cap"]),
+    frozenset(["change_case:lowercase", "change_case:alternating"]),
+    frozenset(["change_case:lowercase", "change_case:first_letter_cap"]),
+    frozenset(["change_case:alternating", "change_case:first_letter_cap"]),
+    frozenset(["change_case:all_caps_target", "change_case:lowercase_target"]),
+    frozenset(["change_case:all_caps_target", "change_case:alternating_target"]),
+    frozenset(["change_case:all_caps_target", "change_case:first_letter_cap_target"]),
+    frozenset(["change_case:lowercase_target", "change_case:alternating_target"]),
+    frozenset(["change_case:lowercase_target", "change_case:first_letter_cap_target"]),
+    frozenset(["change_case:alternating_target", "change_case:first_letter_cap_target"]),
+    frozenset(["startend:start_checker", "startend:wrap_checker"]),
+    frozenset(["startend:end_checker", "startend:wrap_checker"]),
+}
+
 def is_strict_alternating(word: str) -> bool:
     """Check if a word has strictly alternating case."""
     letters = [c for c in word if c.isalpha()]
@@ -274,8 +292,24 @@ def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], 
 
     return (True, "No error")
 
+def check_contradicting_instructions(instructions_list: List[Dict]) -> List[Dict]:
+    """Check for contradicting instruction IDs in the list (order-insensitive)."""
+    errors = []
+    ids = [inst.get("instruction_id") for inst in instructions_list if isinstance(inst, dict) and "instruction_id" in inst]
+    
+    seen_pairs = set()
+    for i, id1 in enumerate(ids):
+        for id2 in ids[i+1:]:
+            pair = frozenset([id1, id2])
+            if pair in CONTRADICTING_PAIRS and pair not in seen_pairs:
+                errors.append({
+                    "error": f"{id1} and {id2} are contradicting"
+                })
+                seen_pairs.add(pair)
+    return errors
+
 def validate_instruction_schema(instructions: Dict) -> List[Dict]:
-    """Validate the schema of instructions against expected arguments."""
+    """Validate the schema of instructions against expected arguments and check for contradicting instructions."""
     mismatches = []
     
     # Validate metadata field
@@ -296,6 +330,11 @@ def validate_instruction_schema(instructions: Dict) -> List[Dict]:
             "actual": type(instructions_list).__name__
         })
         return mismatches
+
+    # Check for contradicting instructions
+    contradiction_errors = check_contradicting_instructions(instructions_list)
+    mismatches.extend(contradiction_errors)
+
 
     # Validate each instruction object
     for i, inst in enumerate(instructions_list):

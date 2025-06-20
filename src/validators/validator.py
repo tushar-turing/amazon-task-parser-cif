@@ -197,13 +197,12 @@ def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], 
             )
 
         if inst_type == "keywords:existence":
-            missing = [kw for kw in kwargs["keywords"] if kw.lower() not in response.lower()]
+            missing = [kw for kw in kwargs["keywords"] if word_frequency(response, kw) == 0]
             return (not missing, "No error" if not missing else f"Missing keyword(s): {missing}")
 
         if inst_type == "keywords:frequency":
             keyword = kwargs["keyword"].strip().lower()
-            matches = re.findall(rf'\b{re.escape(keyword)}\b', response, flags=re.IGNORECASE)
-            count = len(matches)
+            count = word_frequency(response, keyword)
             rel = kwargs["relation"]
             val = kwargs["frequency"]
             valid = eval(f"{count} {'>=' if rel == 'at least' else '==' if rel == 'equal to' else '<'} {val}")
@@ -213,7 +212,7 @@ def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], 
             )
 
         if inst_type == "keywords:forbidden_words":
-            present = [w for w in kwargs["forbidden_words"] if w.lower() in response.lower()]
+            present = [w for w in kwargs["forbidden_words"] if re.search(rf'\b{re.escape(w.lower())}\b', response.lower())]
             return (not present, "No error" if not present else f"Forbidden words found: {present}")
 
         if inst_type == "keywords:letter_frequency":

@@ -47,6 +47,9 @@ CONTRADICTING_PAIRS = {
     frozenset(["startend:start_checker", "startend:wrap_checker"]),
     frozenset(["startend:end_checker", "startend:wrap_checker"]),
     frozenset(["detectable_format:title", "startend:start_checker"]),
+    frozenset(["startend:wrap_checker", "startend:quotation"]),
+    frozenset(["startend:start_checker", "startend:quotation"]),
+    frozenset(["startend:end_checker", "startend:quotation"]),
 }
 
 def is_strict_alternating(word: str) -> bool:

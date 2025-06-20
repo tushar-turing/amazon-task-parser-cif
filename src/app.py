@@ -214,12 +214,12 @@ def show_single_cell_validation():
     # Add button to show contradicting pairs
     if st.button("Show Contradicting Instruction Pairs"):
         pairs = []
-        for pair in CONTRADICTING_PAIRS:
-            pair_list = list(pair)
-            if len(pair_list) == 2:
-                pairs.append({"Instruction 1": pair_list[0], "Instruction 2": pair_list[1]})
-            elif len(pair_list) == 1:
-                pairs.append({"Instruction 1": pair_list[0], "Instruction 2": ""})
+        for instr, conflicting_list in CONTRADICTING_PAIRS.items():
+            if conflicting_list:
+                for conflict in conflicting_list:
+                    pairs.append({"Instruction 1": instr, "Instruction 2": conflict})
+            else:
+                pairs.append({"Instruction 1": instr, "Instruction 2": ""})
         st.markdown("#### Contradicting Instruction Pairs")
         st.table(pairs)
 

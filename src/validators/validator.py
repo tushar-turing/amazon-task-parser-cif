@@ -86,6 +86,11 @@ def word_frequency(response: str, word: str) -> int:
     words = re.findall(r'[^\s]+', response.lower())
     return words.count(word.lower())
 
+def keyword_frequency(response: str, keyword: str) -> int:
+    """Count frequency of a keyword in response, ensuring it's a full word or phrase."""
+    pattern = r'\b' + re.escape(keyword.strip()) + r'\b'
+    return len(re.findall(pattern, response, flags=re.IGNORECASE))
+
 def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], all_instructions: Dict = None) -> Tuple[bool, str]:
     """Validate a response against a specific instruction type and its kwargs."""
     try:
@@ -197,12 +202,12 @@ def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], 
             )
 
         if inst_type == "keywords:existence":
-            missing = [kw for kw in kwargs["keywords"] if word_frequency(response, kw) == 0]
+            missing = [kw for kw in kwargs["keywords"] if keyword_frequency(response, kw) == 0]
             return (not missing, "No error" if not missing else f"Missing keyword(s): {missing}")
 
         if inst_type == "keywords:frequency":
             keyword = kwargs["keyword"].strip().lower()
-            count = word_frequency(response, keyword)
+            count = keyword_frequency(response, keyword)
             rel = kwargs["relation"]
             val = kwargs["frequency"]
             valid = eval(f"{count} {'>=' if rel == 'at least' else '==' if rel == 'equal to' else '<'} {val}")
@@ -212,7 +217,7 @@ def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], 
             )
 
         if inst_type == "keywords:forbidden_words":
-            present = [w for w in kwargs["forbidden_words"] if word_frequency(response, w)]
+            present = [w for w in kwargs["forbidden_words"] if keyword_frequency(response, w)]
             return (not present, "No error" if not present else f"Forbidden words found: {present}")
 
         if inst_type == "keywords:letter_frequency":

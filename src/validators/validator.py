@@ -44,12 +44,6 @@ CONTRADICTING_PAIRS = {
     frozenset(["change_case:lowercase", "change_case:alternating"]),
     frozenset(["change_case:lowercase", "change_case:first_letter_cap"]),
     frozenset(["change_case:alternating", "change_case:first_letter_cap"]),
-    frozenset(["change_case:all_caps_target", "change_case:lowercase_target"]),
-    frozenset(["change_case:all_caps_target", "change_case:alternating_target"]),
-    frozenset(["change_case:all_caps_target", "change_case:first_letter_cap_target"]),
-    frozenset(["change_case:lowercase_target", "change_case:alternating_target"]),
-    frozenset(["change_case:lowercase_target", "change_case:first_letter_cap_target"]),
-    frozenset(["change_case:alternating_target", "change_case:first_letter_cap_target"]),
     frozenset(["startend:start_checker", "startend:wrap_checker"]),
     frozenset(["startend:end_checker", "startend:wrap_checker"]),
     frozenset(["detectable_format:title", "startend:start_checker"]),
@@ -121,7 +115,7 @@ def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], 
         if "_target" in inst_type:
             target = kwargs["target_string"].strip().lower()
             target_escaped = re.escape(target)
-            pattern = rf'(["\']?{target_escaped}["\']?)'
+            pattern = rf'\b{target_escaped}\b'
             matches = re.findall(pattern, response, re.IGNORECASE)
 
             if not matches:

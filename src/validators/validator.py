@@ -212,7 +212,7 @@ def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], 
             )
 
         if inst_type == "keywords:forbidden_words":
-            present = [w for w in kwargs["forbidden_words"] if re.search(rf'\b{re.escape(w.lower())}\b', response.lower())]
+            present = [w for w in kwargs["forbidden_words"] if word_frequency(response, w)]
             return (not present, "No error" if not present else f"Forbidden words found: {present}")
 
         if inst_type == "keywords:letter_frequency":

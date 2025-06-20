@@ -83,7 +83,7 @@ def count_lowercase_words(response: str) -> int:
 
 def word_frequency(response: str, word: str) -> int:
     """Count frequency of a word in response."""
-    words = re.findall(r'\b\w+\b', response.lower())
+    words = re.findall(r'[^\s]+', response.lower())
     return words.count(word.lower())
 
 def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], all_instructions: Dict = None) -> Tuple[bool, str]:

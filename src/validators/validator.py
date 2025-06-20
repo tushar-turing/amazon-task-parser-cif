@@ -36,20 +36,79 @@ EXPECTED_ARGUMENTS = {
     "startend:quotation": []
 }
 
-# Common-sense contradicting instruction pairs (unordered)
 CONTRADICTING_PAIRS = {
-    frozenset(["change_case:all_caps", "change_case:lowercase"]),
-    frozenset(["change_case:all_caps", "change_case:alternating"]),
-    frozenset(["change_case:all_caps", "change_case:first_letter_cap"]),
-    frozenset(["change_case:lowercase", "change_case:alternating"]),
-    frozenset(["change_case:lowercase", "change_case:first_letter_cap"]),
-    frozenset(["change_case:alternating", "change_case:first_letter_cap"]),
-    frozenset(["startend:start_checker", "startend:wrap_checker"]),
-    frozenset(["startend:end_checker", "startend:wrap_checker"]),
-    frozenset(["detectable_format:title", "startend:start_checker"]),
-    frozenset(["startend:wrap_checker", "startend:quotation"]),
-    frozenset(["startend:start_checker", "startend:quotation"]),
-    frozenset(["startend:end_checker", "startend:quotation"]),
+    "change_case:all_caps": [
+        "change_case:lowercase",
+        "change_case:alternating",
+        "change_case:first_letter_cap",
+        "change_case:all_caps_target"
+    ],
+    "change_case:lowercase": [
+        "change_case:all_caps",
+        "change_case:alternating",
+        "change_case:first_letter_cap",
+        "change_case:lowercase_target"
+    ],
+    "change_case:alternating": [
+        "change_case:all_caps",
+        "change_case:lowercase",
+        "change_case:first_letter_cap",
+        "change_case:alternating_target"
+    ],
+    "change_case:first_letter_cap": [
+        "change_case:all_caps",
+        "change_case:lowercase",
+        "change_case:alternating",
+        "change_case:first_letter_cap_target"
+    ],
+    "change_case:all_caps_target": ["change_case:all_caps"],
+    "change_case:lowercase_target": ["change_case:lowercase"],
+    "change_case:alternating_target": ["change_case:alternating"],
+    "change_case:first_letter_cap_target": ["change_case:first_letter_cap"],
+    "detectable_format:json_format": [
+        "detectable_format:multiple_sections",
+        "detectable_format:numbered_list",
+        "detectable_format:number_bullet_lists",
+        "detectable_format:title",
+        "startend:quotation",
+        "startend:wrap_checker",
+        "startend:start_checker",
+        "startend:end_checker"
+    ],
+    "detectable_format:multiple_sections": ["detectable_format:json_format"],
+    "detectable_format:numbered_list": ["detectable_format:json_format"],
+    "detectable_format:number_bullet_lists": ["detectable_format:json_format"],
+    "detectable_format:title": [
+        "detectable_format:json_format",
+        "startend:quotation",
+        "startend:wrap_checker",
+        "startend:start_checker"
+    ],
+    "startend:quotation": [
+        "startend:wrap_checker",
+        "startend:start_checker",
+        "startend:end_checker",
+        "detectable_format:json_format",
+        "detectable_format:title"
+    ],
+    "startend:wrap_checker": [
+        "startend:quotation",
+        "startend:start_checker",
+        "startend:end_checker",
+        "detectable_format:json_format",
+        "detectable_format:title"
+    ],
+    "startend:start_checker": [
+        "startend:quotation",
+        "startend:wrap_checker",
+        "detectable_format:title",
+        "detectable_format:json_format"
+    ],
+    "startend:end_checker": [
+        "startend:quotation",
+        "startend:wrap_checker",
+        "detectable_format:json_format"
+    ]
 }
 
 def is_strict_alternating(word: str) -> bool:
@@ -291,19 +350,19 @@ def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], 
 
 def check_contradicting_instructions(instructions_list: List[Dict]) -> List[Dict]:
     """Check for contradicting instruction IDs in the list (order-insensitive)."""
-    errors = []
-    ids = [inst.get("instruction_id") for inst in instructions_list if isinstance(inst, dict) and "instruction_id" in inst]
-    
-    seen_pairs = set()
-    for i, id1 in enumerate(ids):
-        for id2 in ids[i+1:]:
-            pair = frozenset([id1, id2])
-            if pair in CONTRADICTING_PAIRS and pair not in seen_pairs:
-                errors.append({
-                    "error": f"{id1} and {id2} are contradicting"
-                })
+    errors, seen_pairs = set(), set()
+    # Collect all instruction IDs
+    ids = {inst["instruction_id"] for inst in instructions_list if isinstance(inst, dict) and "instruction_id" in inst}
+
+    # Check each instruction for conflicts
+    for instr_id in ids:
+        for conflicting_id in CONTRADICTING_PAIRS.get(instr_id, []):
+            pair = frozenset([instr_id, conflicting_id])
+            if conflicting_id in ids and pair not in seen_pairs:
+                errors.add(f"{instr_id} and {conflicting_id} are contradicting")
                 seen_pairs.add(pair)
-    return errors
+
+    return list(errors)
 
 def validate_instruction_schema(instructions: Dict) -> List[Dict]:
     """Validate the schema of instructions against expected arguments and check for contradicting instructions."""

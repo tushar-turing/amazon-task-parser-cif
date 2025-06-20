@@ -18,3 +18,7 @@ samples/
 
 */__pycache__/
 */notebooks-output/
+
+*.ipynb
+venv/
+**/__pycache__/

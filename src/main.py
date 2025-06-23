@@ -1,8 +1,8 @@
 import os
 import sys
 import json
-from notebook_processing.processor import process_notebook
-from validators.validator import validate_instruction, validate_instruction_schema
+from notebook_processing.processor import process_notebook, process_notebook_with_metadata_report
+from validators.validator import validate_instruction
 
 def run_validation(input_json_path: str, output_log_path: str) -> None:
     """Run validation on the input JSON and save results to output path."""
@@ -60,13 +60,18 @@ def run_batch_processing(input_dir: str, output_base_dir: str) -> None:
         output_dir = os.path.join(output_base_dir, base_name)
         os.makedirs(output_dir, exist_ok=True)
 
-        # Step 1: Convert notebook to json
+        # Step 1: Convert notebook to json and get metadata change report
         print(f"\n📘 Processing notebook: {ipynb_file}")
-        converted = process_notebook(input_path, dialogue_id=base_name)
+        converted, metadata_report = process_notebook_with_metadata_report(input_path, dialogue_id=base_name)
         converted_path = os.path.join(output_dir, "converted_output.json")
         with open(converted_path, "w", encoding="utf-8") as f:
             json.dump(converted, f, indent=2, ensure_ascii=False)
         print(f"✅ Converted JSON saved to: {converted_path}")
+
+        # Save metadata change report
+        metadata_report_path = os.path.join(output_dir, "metadata_change_report.json")
+        with open(metadata_report_path, "w", encoding="utf-8") as f:
+            json.dump(metadata_report, f, indent=2, ensure_ascii=False)
 
         # Step 2: Validate and export report
         validation_txt_path = os.path.join(output_dir, "validation_report.json")

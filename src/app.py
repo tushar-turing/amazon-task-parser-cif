@@ -109,6 +109,13 @@ def show_batch_processing():
                                 with open(validation_path, 'r', encoding='utf-8') as f:
                                     validation_data = json.load(f)
                                 st.json(validation_data)
+                            # Display metadata change report
+                            metadata_report_path = os.path.join(result_dir, "metadata_change_report.json")
+                            if os.path.exists(metadata_report_path):
+                                st.markdown("#### Metadata Change Report")
+                                with open(metadata_report_path, 'r', encoding='utf-8') as f:
+                                    metadata_report = json.load(f)
+                                st.json(metadata_report)
 
 def show_single_cell_validation():
     st.header("Single Cell Validation")

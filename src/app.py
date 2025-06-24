@@ -16,9 +16,9 @@ st.set_page_config(
 def call_nova_api(user_content, system_content="You are a chatbot", temperature=0.7, seed=42, top_p=1, top_k=40, max_tokens=1000):
     url = "https://kong.turing.com/api/llm-gateway"
     headers = {
-        "x-api-key": "sk_key_snow_b8b48aff-ddc4-4ea2-a5f5-28311f0be068",
-        "x-api-gw-key": "0c015800-dcba-448d-94bb-d01a56b0d22c",
-        "Authorization": "Basic YWRtaW46VHVyaW5nQDEyMw==",
+        "x-api-key": os.getenv("TURING_API_KEY"),
+        "x-api-gw-key": os.getenv("TURING_API_GW_KEY"),
+        "Authorization": os.getenv("TURING_AUTH_TOKEN"),
         "Content-Type": "application/json"
     }
     payload = {
@@ -38,9 +38,8 @@ def call_nova_api(user_content, system_content="You are a chatbot", temperature=
         "images": []
     }
     response = requests.post(url, headers=headers, json=payload)
-    if response.status_code == 200:
+    if response.status_code in (200, 201):
         data = response.json()
-        # Nova returns: {"choices": [{"message": {"content": ...}}]}
         return data["choices"][0]["message"]["content"]
     else:
         return f"Error: {response.status_code} - {response.text}"
@@ -236,59 +235,59 @@ def show_nova_single_turn():
     user_prompt = st.text_area("User Prompt", height=100)
     instructions_json = st.text_area("Instructions JSON", height=200, help="Paste the instructions JSON following the schema above")
     # Disable button and add tooltip
-    st.button("Run Nova & Validate", key="nova_single", disabled=True, help="Coming soon")
-    # if st.button("Run Nova & Validate", key="nova_single"):
-    #     if not user_prompt or not instructions_json:
-    #         st.error("Please provide both User Prompt and Instructions JSON")
-    #         return
-    #     try:
-    #         instructions = json.loads(instructions_json)
-    #     except Exception as e:
-    #         st.error(f"Invalid JSON: {e}")
-    #         return
-    #     with st.spinner("Calling Nova model..."):
-    #         nova_response = call_nova_api(user_prompt)
-    #     st.subheader("Nova Model Response")
-    #     st.write(nova_response)
-    #     # Validate
-    #     try:
-    #         # Schema checks (reuse from single cell validation)
-    #         if not isinstance(instructions, dict):
-    #             st.error("Instructions must be a JSON object")
-    #             return
-    #         if "metadata" not in instructions or "instructions" not in instructions:
-    #             st.error("Instructions must contain 'metadata' and 'instructions' fields")
-    #             return
-    #         if not isinstance(instructions["metadata"], list):
-    #             st.error("'metadata' must be a list")
-    #             return
-    #         if not isinstance(instructions["instructions"], list):
-    #             st.error("'instructions' must be a list")
-    #             return
-    #         for instruction in instructions["instructions"]:
-    #             if not isinstance(instruction, dict):
-    #                 st.error("Each instruction must be an object")
-    #                 return
-    #             if "instruction_id" not in instruction:
-    #                 st.error("Each instruction must have an 'instruction_id' field")
-    #                 return
-    #         results = []
-    #         for instruction in instructions["instructions"]:
-    #             inst_id = instruction["instruction_id"]
-    #             kwargs = {k: v for k, v in instruction.items() if k != "instruction_id"}
-    #             valid, message = validate_instruction(nova_response, inst_id, kwargs, instructions)
-    #             results.append({
-    #                 "instruction": inst_id,
-    #                 "status": "Passed" if valid else "Failed",
-    #                 "message": message
-    #             })
-    #         st.success("Validation complete!")
-    #         st.json({
-    #             "response": nova_response[:100] + "..." if len(nova_response) > 100 else nova_response,
-    #             "results": results
-    #         })
-    #     except Exception as e:
-    #         st.error(f"Validation error: {e}")
+    # st.button("Run Nova & Validate", key="nova_single", disabled=True, help="Coming soon")
+    if st.button("Run Nova & Validate", key="nova_single"):
+        if not user_prompt or not instructions_json:
+            st.error("Please provide both User Prompt and Instructions JSON")
+            return
+        try:
+            instructions = json.loads(instructions_json)
+        except Exception as e:
+            st.error(f"Invalid JSON: {e}")
+            return
+        with st.spinner("Calling Nova model..."):
+            nova_response = call_nova_api(user_prompt)
+        st.subheader("Nova Model Response")
+        st.write(nova_response)
+        # Validate
+        try:
+            # Schema checks (reuse from single cell validation)
+            if not isinstance(instructions, dict):
+                st.error("Instructions must be a JSON object")
+                return
+            if "metadata" not in instructions or "instructions" not in instructions:
+                st.error("Instructions must contain 'metadata' and 'instructions' fields")
+                return
+            if not isinstance(instructions["metadata"], list):
+                st.error("'metadata' must be a list")
+                return
+            if not isinstance(instructions["instructions"], list):
+                st.error("'instructions' must be a list")
+                return
+            for instruction in instructions["instructions"]:
+                if not isinstance(instruction, dict):
+                    st.error("Each instruction must be an object")
+                    return
+                if "instruction_id" not in instruction:
+                    st.error("Each instruction must have an 'instruction_id' field")
+                    return
+            results = []
+            for instruction in instructions["instructions"]:
+                inst_id = instruction["instruction_id"]
+                kwargs = {k: v for k, v in instruction.items() if k != "instruction_id"}
+                valid, message = validate_instruction(nova_response, inst_id, kwargs, instructions)
+                results.append({
+                    "instruction": inst_id,
+                    "status": "Passed" if valid else "Failed",
+                    "message": message
+                })
+            st.success("Validation complete!")
+            st.json({
+                "response": nova_response[:100] + "..." if len(nova_response) > 100 else nova_response,
+                "results": results
+            })
+        except Exception as e:
+            st.error(f"Validation error: {e}")
 
 def show_nova_batch():
     st.header("Nova Model: Batch Test & Validation")
@@ -296,57 +295,57 @@ def show_nova_batch():
     uploaded_file = st.file_uploader("Upload Jupyter notebook", type=["ipynb"], key="nova_batch")
     # Disable button and add tooltip
     st.button("Run Nova Batch", key="nova_batch_btn", disabled=True, help="Coming soon")
-    # if uploaded_file and st.button("Run Nova Batch", key="nova_batch_btn"):
-    #     with st.spinner("Processing notebook and calling Nova model for each turn..."):
-    #         # Save to temp file
-    #         with tempfile.NamedTemporaryFile(delete=False, suffix=".ipynb") as tmp:
-    #             tmp.write(uploaded_file.getbuffer())
-    #             tmp_path = tmp.name
-    #         from notebook_processing.processor import process_notebook
-    #         notebook_data = process_notebook(tmp_path)
-    #         results = []
-    #         for turn in notebook_data["turns"]:
-    #             prompt = turn.get("prompt", "")
-    #             instructions = turn.get("instructions", {})
-    #             if not prompt or not instructions:
-    #                 continue
-    #             try:
-    #                 nova_response = call_nova_api(prompt)
-    #             except Exception as e:
-    #                 nova_response = f"Nova error: {e}"
-    #             turn_result = {"prompt": prompt, "instructions": instructions, "nova_response": nova_response, "validation": []}
-    #             # Validate
-    #             try:
-    #                 if not isinstance(instructions, dict):
-    #                     turn_result["validation"].append({"error": "Instructions must be a JSON object"})
-    #                 elif "metadata" not in instructions or "instructions" not in instructions:
-    #                     turn_result["validation"].append({"error": "Instructions must contain 'metadata' and 'instructions' fields"})
-    #                 elif not isinstance(instructions["metadata"], list):
-    #                     turn_result["validation"].append({"error": "'metadata' must be a list"})
-    #                 elif not isinstance(instructions["instructions"], list):
-    #                     turn_result["validation"].append({"error": "'instructions' must be a list"})
-    #                 else:
-    #                     for instruction in instructions["instructions"]:
-    #                         if not isinstance(instruction, dict) or "instruction_id" not in instruction:
-    #                             turn_result["validation"].append({"error": "Each instruction must be an object with 'instruction_id'"})
-    #                             continue
-    #                         inst_id = instruction["instruction_id"]
-    #                         kwargs = {k: v for k, v in instruction.items() if k != "instruction_id"}
-    #                         valid, message = validate_instruction(nova_response, inst_id, kwargs, instructions)
-    #                         turn_result["validation"].append({
-    #                             "instruction": inst_id,
-    #                             "status": "Passed" if valid else "Failed",
-    #                             "message": message
-    #                         })
-    #             except Exception as e:
-    #                 turn_result["validation"].append({"error": f"Validation error: {e}"})
-    #             results.append(turn_result)
-    #         st.success("Batch Nova validation complete!")
-    #         for i, res in enumerate(results):
-    #             st.markdown(f"#### Turn {i+1}")
-    #             st.markdown(f"**Prompt:** {res['prompt']}")
-    #             st.markdown(f"**Nova Response:** {res['nova_response']}")
-    #             st.json(res["validation"])
+    if uploaded_file and st.button("Run Nova Batch", key="nova_batch_btn"):
+        with st.spinner("Processing notebook and calling Nova model for each turn..."):
+            # Save to temp file
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".ipynb") as tmp:
+                tmp.write(uploaded_file.getbuffer())
+                tmp_path = tmp.name
+            from notebook_processing.processor import process_notebook
+            notebook_data = process_notebook(tmp_path)
+            results = []
+            for turn in notebook_data["turns"]:
+                prompt = turn.get("prompt", "")
+                instructions = turn.get("instructions", {})
+                if not prompt or not instructions:
+                    continue
+                try:
+                    nova_response = call_nova_api(prompt)
+                except Exception as e:
+                    nova_response = f"Nova error: {e}"
+                turn_result = {"prompt": prompt, "instructions": instructions, "nova_response": nova_response, "validation": []}
+                # Validate
+                try:
+                    if not isinstance(instructions, dict):
+                        turn_result["validation"].append({"error": "Instructions must be a JSON object"})
+                    elif "metadata" not in instructions or "instructions" not in instructions:
+                        turn_result["validation"].append({"error": "Instructions must contain 'metadata' and 'instructions' fields"})
+                    elif not isinstance(instructions["metadata"], list):
+                        turn_result["validation"].append({"error": "'metadata' must be a list"})
+                    elif not isinstance(instructions["instructions"], list):
+                        turn_result["validation"].append({"error": "'instructions' must be a list"})
+                    else:
+                        for instruction in instructions["instructions"]:
+                            if not isinstance(instruction, dict) or "instruction_id" not in instruction:
+                                turn_result["validation"].append({"error": "Each instruction must be an object with 'instruction_id'"})
+                                continue
+                            inst_id = instruction["instruction_id"]
+                            kwargs = {k: v for k, v in instruction.items() if k != "instruction_id"}
+                            valid, message = validate_instruction(nova_response, inst_id, kwargs, instructions)
+                            turn_result["validation"].append({
+                                "instruction": inst_id,
+                                "status": "Passed" if valid else "Failed",
+                                "message": message
+                            })
+                except Exception as e:
+                    turn_result["validation"].append({"error": f"Validation error: {e}"})
+                results.append(turn_result)
+            st.success("Batch Nova validation complete!")
+            for i, res in enumerate(results):
+                st.markdown(f"#### Turn {i+1}")
+                st.markdown(f"**Prompt:** {res['prompt']}")
+                st.markdown(f"**Nova Response:** {res['nova_response']}")
+                st.json(res["validation"])
 
 if __name__ == "__main__":
     main() 

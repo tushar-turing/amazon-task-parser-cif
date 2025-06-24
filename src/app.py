@@ -48,24 +48,19 @@ def main():
     st.title("Turing Amazon Task Parser VIF")
     st.markdown("Process and validate Jupyter notebooks containing Turing Amazon task data.")
     # Tabs
-    tab2, tab1, tab3, tab4 = st.tabs([
+    tab2, tab1, tab3 = st.tabs([
         "Validation (Single Turn)",
         "Validation (Batch/Notebook)",
-        "Nova (Single Turn)",
-        "Nova (Notebook/Batch)"
+        "Nova (Conversation)",
     ])
     with tab1:
         show_batch_processing()
     with tab2:
         show_single_cell_validation()
     with tab3:
-        st.subheader("Nova Model: Single Turn Test & Validation")
+        st.subheader("Nova Model: Conversation Test & Validation")
         st.markdown("Test a prompt against the Nova model and validate the result.")
         show_nova_single_turn()
-    with tab4:
-        st.subheader("Nova Model: Batch Test & Validation")
-        st.markdown("Upload a Jupyter notebook, run each turn through Nova, and validate the results.")
-        show_nova_batch()
 
 def show_batch_processing():
     st.header("Notebook Processing and Validation")
@@ -230,71 +225,94 @@ def show_single_cell_validation():
         st.table(pairs)
 
 def show_nova_single_turn():
-    user_prompt = st.text_area("User Prompt", height=100)
-    instructions_json = st.text_area("Instructions JSON", height=200, help="Paste the instructions JSON following the schema above")
-    if st.button("Run Nova & Validate", key="nova_single"):
-        if not user_prompt or not instructions_json:
-            st.error("Please provide both User Prompt and Instructions JSON")
+    if "conversation" not in st.session_state:
+        st.session_state["conversation"] = []
+    # Display all previous turns
+    remove_turn_idx = None
+    for idx, turn in enumerate(st.session_state["conversation"]):
+        st.markdown(f"**Turn {idx+1}**")
+        st.text_area(f"User Prompt {idx+1}", value=turn["prompt"], key=f"prompt_{idx}", disabled=True)
+        st.text_area(f"Instructions JSON {idx+1}", value=turn["instructions_json"], key=f"instructions_{idx}", disabled=True)
+        st.code(turn["nova_response"], language=None)
+        if st.button(f"Remove Turn {idx+1}"):
+            remove_turn_idx = idx
+    if remove_turn_idx is not None:
+        st.session_state["conversation"].pop(remove_turn_idx)
+        st.experimental_rerun()
+    # Add new turn (only one at a time, not appended until Run Nova is clicked)
+    st.markdown("---")
+    st.markdown("**Add New Turn**")
+    new_prompt = st.text_area("User Prompt", height=100, key="new_prompt")
+    new_instructions_json = st.text_area("Instructions JSON", height=200, help="Paste the instructions JSON following the schema above", key="new_instructions")
+    if st.button("Run Nova & Validate Conversation", key="nova_multi"):
+        if not new_prompt or not new_instructions_json:
+            st.error("Please provide both User Prompt and Instructions JSON for the new turn.")
             return
+        # Build conversation context
+        messages = []
+        for prev_turn in st.session_state["conversation"]:
+            messages.append({"role": "user", "content": prev_turn["prompt"]})
+            messages.append({"role": "assistant", "content": prev_turn["nova_response"]})
+        messages.append({"role": "user", "content": new_prompt})
+        # Call Nova with full context
         try:
-            instructions = json.loads(instructions_json)
+            instructions = json.loads(new_instructions_json)
         except Exception as e:
-            st.error(f"Invalid JSON: {e}")
+            st.error(f"Invalid JSON in new turn: {e}")
             return
-        with st.spinner("Calling Nova model..."):
-            nova_response = call_nova_api(user_prompt)
-        st.subheader("Nova Model Response")
+        with st.spinner("Calling Nova model for new turn with context..."):
+            # Modify call_nova_api to accept messages if needed, else join context
+            # For now, join all user/assistant messages as a single string
+            context_prompt = "\n".join([m["content"] for m in messages])
+            nova_response = call_nova_api(context_prompt)
+        st.markdown(f"**Nova Model Response for Turn {len(st.session_state['conversation'])+1}:**")
+        st.code(nova_response, language=None)
         st.write(nova_response)
         # Validate
         try:
-            # Schema checks (reuse from single cell validation)
             if not isinstance(instructions, dict):
-                st.error("Instructions must be a JSON object")
-                return
-            if "metadata" not in instructions or "instructions" not in instructions:
-                st.error("Instructions must contain 'metadata' and 'instructions' fields")
-                return
-            if not isinstance(instructions["metadata"], list):
-                st.error("'metadata' must be a list")
-                return
-            if not isinstance(instructions["instructions"], list):
-                st.error("'instructions' must be a list")
-                return
-            for instruction in instructions["instructions"]:
-                if not isinstance(instruction, dict):
-                    st.error("Each instruction must be an object")
-                    return
-                if "instruction_id" not in instruction:
-                    st.error("Each instruction must have an 'instruction_id' field")
-                    return
-            results = []
-            for instruction in instructions["instructions"]:
-                inst_id = instruction["instruction_id"]
-                kwargs = {k: v for k, v in instruction.items() if k != "instruction_id"}
-                valid, message = validate_instruction(nova_response, inst_id, kwargs, instructions)
-                results.append({
-                    "instruction": inst_id,
-                    "status": "Passed" if valid else "Failed",
-                    "message": message
+                st.error(f"Instructions in new turn must be a JSON object")
+            elif "metadata" not in instructions or "instructions" not in instructions:
+                st.error(f"Instructions in new turn must contain 'metadata' and 'instructions' fields")
+            elif not isinstance(instructions["metadata"], list):
+                st.error(f"'metadata' must be a list in new turn")
+            elif not isinstance(instructions["instructions"], list):
+                st.error(f"'instructions' must be a list in new turn")
+            else:
+                results = []
+                for instruction in instructions["instructions"]:
+                    if not isinstance(instruction, dict) or "instruction_id" not in instruction:
+                        st.error(f"Each instruction in new turn must be an object with 'instruction_id'")
+                        continue
+                    inst_id = instruction["instruction_id"]
+                    kwargs = {k: v for k, v in instruction.items() if k != "instruction_id"}
+                    valid, message = validate_instruction(nova_response, inst_id, kwargs, instructions)
+                    results.append({
+                        "instruction": inst_id,
+                        "status": "Passed" if valid else "Failed",
+                        "message": message
+                    })
+                st.success(f"Validation complete for new turn!")
+                st.json({
+                    "response": nova_response[:100] + "..." if len(nova_response) > 100 else nova_response,
+                    "results": results
                 })
-            st.success("Validation complete!")
-            st.json({
-                "response": nova_response[:100] + "..." if len(nova_response) > 100 else nova_response,
-                "results": results
-            })
         except Exception as e:
-            st.error(f"Validation error: {e}")
+            st.error(f"Validation error in new turn: {e}")
+        # Append the new turn to the conversation
+        st.session_state["conversation"].append({
+            "prompt": new_prompt,
+            "instructions_json": new_instructions_json,
+            "nova_response": nova_response
+        })
+        st.experimental_rerun()
 
 def show_nova_batch():
     uploaded_file = st.file_uploader("Upload Jupyter notebook", type=["ipynb"], key="nova_batch")
-    if uploaded_file and st.button("Run Nova Batch", key="nova_batch_btn"):
+    if uploaded_file:
         with st.spinner("Processing notebook and calling Nova model for each turn..."):
-            # Save to temp file
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".ipynb") as tmp:
-                tmp.write(uploaded_file.getbuffer())
-                tmp_path = tmp.name
             from notebook_processing.processor import process_notebook
-            notebook_data = process_notebook(tmp_path)
+            notebook_data = process_notebook(uploaded_file)
             results = []
             for turn in notebook_data["turns"]:
                 prompt = turn.get("prompt", "")

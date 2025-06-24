@@ -230,12 +230,8 @@ def show_single_cell_validation():
         st.table(pairs)
 
 def show_nova_single_turn():
-    st.header("Nova Model: Single Turn Test & Validation")
-    st.markdown("Test a prompt against the Nova model and validate the result.")
     user_prompt = st.text_area("User Prompt", height=100)
     instructions_json = st.text_area("Instructions JSON", height=200, help="Paste the instructions JSON following the schema above")
-    # Disable button and add tooltip
-    # st.button("Run Nova & Validate", key="nova_single", disabled=True, help="Coming soon")
     if st.button("Run Nova & Validate", key="nova_single"):
         if not user_prompt or not instructions_json:
             st.error("Please provide both User Prompt and Instructions JSON")
@@ -290,11 +286,7 @@ def show_nova_single_turn():
             st.error(f"Validation error: {e}")
 
 def show_nova_batch():
-    st.header("Nova Model: Batch Test & Validation")
-    st.markdown("Upload a Jupyter notebook, run each turn through Nova, and validate the results.")
     uploaded_file = st.file_uploader("Upload Jupyter notebook", type=["ipynb"], key="nova_batch")
-    # Disable button and add tooltip
-    st.button("Run Nova Batch", key="nova_batch_btn", disabled=True, help="Coming soon")
     if uploaded_file and st.button("Run Nova Batch", key="nova_batch_btn"):
         with st.spinner("Processing notebook and calling Nova model for each turn..."):
             # Save to temp file

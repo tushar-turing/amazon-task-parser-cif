@@ -234,6 +234,10 @@ def show_nova_single_turn():
         st.text_area(f"User Prompt {idx+1}", value=turn["prompt"], key=f"prompt_{idx}", disabled=True)
         st.text_area(f"Instructions JSON {idx+1}", value=turn["instructions_json"], key=f"instructions_{idx}", disabled=True)
         st.code(turn["nova_response"], language=None)
+        # Display validation report for previous turns
+        if "validation_report" in turn:
+            st.markdown("**Validation Report:**")
+            st.json(turn["validation_report"])
         if st.button(f"Remove Turn {idx+1}"):
             remove_turn_idx = idx
     if remove_turn_idx is not None:
@@ -261,14 +265,12 @@ def show_nova_single_turn():
             st.error(f"Invalid JSON in new turn: {e}")
             return
         with st.spinner("Calling Nova model for new turn with context..."):
-            # Modify call_nova_api to accept messages if needed, else join context
-            # For now, join all user/assistant messages as a single string
             context_prompt = "\n".join([m["content"] for m in messages])
             nova_response = call_nova_api(context_prompt)
         st.markdown(f"**Nova Model Response for Turn {len(st.session_state['conversation'])+1}:**")
         st.code(nova_response, language=None)
-        st.write(nova_response)
         # Validate
+        validation_report = None
         try:
             if not isinstance(instructions, dict):
                 st.error(f"Instructions in new turn must be a JSON object")
@@ -292,18 +294,21 @@ def show_nova_single_turn():
                         "status": "Passed" if valid else "Failed",
                         "message": message
                     })
-                st.success(f"Validation complete for new turn!")
-                st.json({
+                validation_report = {
                     "response": nova_response[:100] + "..." if len(nova_response) > 100 else nova_response,
                     "results": results
-                })
+                }
+                st.success(f"Validation complete for new turn!")
+                st.markdown("**Validation Report:**")
+                st.json(validation_report)
         except Exception as e:
             st.error(f"Validation error in new turn: {e}")
-        # Append the new turn to the conversation
+        # Append the new turn to the conversation, including validation report
         st.session_state["conversation"].append({
             "prompt": new_prompt,
             "instructions_json": new_instructions_json,
-            "nova_response": nova_response
+            "nova_response": nova_response,
+            "validation_report": validation_report
         })
         st.rerun()
 

@@ -238,7 +238,7 @@ def show_nova_single_turn():
             remove_turn_idx = idx
     if remove_turn_idx is not None:
         st.session_state["conversation"].pop(remove_turn_idx)
-        st.experimental_rerun()
+        st.rerun()
     # Add new turn (only one at a time, not appended until Run Nova is clicked)
     st.markdown("---")
     st.markdown("**Add New Turn**")
@@ -305,7 +305,7 @@ def show_nova_single_turn():
             "instructions_json": new_instructions_json,
             "nova_response": nova_response
         })
-        st.experimental_rerun()
+        st.rerun()
 
 def show_nova_batch():
     uploaded_file = st.file_uploader("Upload Jupyter notebook", type=["ipynb"], key="nova_batch")

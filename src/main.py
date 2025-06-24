@@ -3,6 +3,7 @@ import sys
 import json
 from notebook_processing.processor import process_notebook, process_notebook_with_metadata_report
 from validators.validator import validate_instruction
+from notebook_processing.schema_transformer import convert_to_final_schema
 
 def run_validation(input_json_path: str, output_log_path: str) -> None:
     """Run validation on the input JSON and save results to output path."""
@@ -63,10 +64,12 @@ def run_batch_processing(input_dir: str, output_base_dir: str) -> None:
         # Step 1: Convert notebook to json and get metadata change report
         print(f"\n📘 Processing notebook: {ipynb_file}")
         converted, metadata_report = process_notebook_with_metadata_report(input_path, dialogue_id=base_name)
-        converted_path = os.path.join(output_dir, "converted_output.json")
-        with open(converted_path, "w", encoding="utf-8") as f:
-            json.dump(converted, f, indent=2, ensure_ascii=False)
-        print(f"✅ Converted JSON saved to: {converted_path}")
+        # Generate the new schema output
+        final_output = convert_to_final_schema(converted, ipynb_file)
+        final_output_path = os.path.join(output_dir, "final_output.json")
+        with open(final_output_path, "w", encoding="utf-8") as f:
+            json.dump(final_output, f, indent=2, ensure_ascii=False)
+        print(f"✅ Final output JSON saved to: {final_output_path}")
 
         # Save metadata change report
         metadata_report_path = os.path.join(output_dir, "metadata_change_report.json")
@@ -75,7 +78,7 @@ def run_batch_processing(input_dir: str, output_base_dir: str) -> None:
 
         # Step 2: Validate and export report
         validation_txt_path = os.path.join(output_dir, "validation_report.json")
-        run_validation(converted_path, validation_txt_path)
+        run_validation(final_output_path, validation_txt_path)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

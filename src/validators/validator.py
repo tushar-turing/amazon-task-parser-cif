@@ -2,6 +2,11 @@ import re
 import string
 import json
 from typing import Dict, List, Tuple, Any
+import copy
+import json
+import re
+from data_loader import conflict_dict
+from collections import defaultdict
 
 # Map of expected kwargs for each instruction ID
 EXPECTED_ARGUMENTS = {
@@ -34,22 +39,6 @@ EXPECTED_ARGUMENTS = {
     "startend:end_checker": ["end_phrase"],
     "startend:wrap_checker": ["wrap_phrase"],
     "startend:quotation": []
-}
-
-# Common-sense contradicting instruction pairs (unordered)
-CONTRADICTING_PAIRS = {
-    frozenset(["change_case:all_caps", "change_case:lowercase"]),
-    frozenset(["change_case:all_caps", "change_case:alternating"]),
-    frozenset(["change_case:all_caps", "change_case:first_letter_cap"]),
-    frozenset(["change_case:lowercase", "change_case:alternating"]),
-    frozenset(["change_case:lowercase", "change_case:first_letter_cap"]),
-    frozenset(["change_case:alternating", "change_case:first_letter_cap"]),
-    frozenset(["startend:start_checker", "startend:wrap_checker"]),
-    frozenset(["startend:end_checker", "startend:wrap_checker"]),
-    frozenset(["detectable_format:title", "startend:start_checker"]),
-    frozenset(["startend:wrap_checker", "startend:quotation"]),
-    frozenset(["startend:start_checker", "startend:quotation"]),
-    frozenset(["startend:end_checker", "startend:quotation"]),
 }
 
 def is_strict_alternating(word: str) -> bool:
@@ -296,17 +285,16 @@ def validate_instruction(response: str, inst_type: str, kwargs: Dict[str, Any], 
 
 def check_contradicting_instructions(instructions_list: List[Dict]) -> List[Dict]:
     """Check for contradicting instruction IDs in the list (order-insensitive)."""
-    errors = []
-    ids = [inst.get("instruction_id") for inst in instructions_list if isinstance(inst, dict) and "instruction_id" in inst]
-    
-    seen_pairs = set()
-    for i, id1 in enumerate(ids):
-        for id2 in ids[i+1:]:
-            pair = frozenset([id1, id2])
-            if pair in CONTRADICTING_PAIRS and pair not in seen_pairs:
-                errors.append({
-                    "error": f"{id1} and {id2} are contradicting"
-                })
+    errors, seen_pairs = set(), set()
+    # Collect all instruction IDs
+    ids = {inst["instruction_id"] for inst in instructions_list if isinstance(inst, dict) and "instruction_id" in inst}
+
+    # Check each instruction for conflicts
+    for instr_id in ids:
+        for conflicting_id in conflict_dict.get(instr_id, []):
+            pair = frozenset([instr_id, conflicting_id])
+            if conflicting_id in ids and pair not in seen_pairs:
+                errors.add(f"{instr_id} and {conflicting_id} are contradicting")
                 seen_pairs.add(pair)
     return errors
 
@@ -368,3 +356,358 @@ def validate_instruction_schema(instructions: Dict) -> List[Dict]:
             })
 
     return mismatches 
+
+def extract_notebook_sections_as_dict(ipynb_path):
+    with open(ipynb_path, 'r', encoding='utf-8') as file:
+        notebook_data = json.load(file)
+
+    result = defaultdict(list)
+
+    for cell in notebook_data.get('cells', []):
+        if cell.get('cell_type') != 'markdown':
+            continue
+
+        content = ''.join(cell.get('source', [])).strip()
+        split_lines = content.splitlines()
+        if split_lines[0] == '# Metadata':
+            result['task_metadata'].append(content)
+            continue
+
+        match = re.search(r'\*\*\[(\w+)]\*\*', split_lines[0])
+        title = match.group(1)
+
+        result[title].append('\n'.join(split_lines[1:]))
+
+    return result
+
+
+def validate_notebook_schema(notebook, template_json, log_filename):
+    logs = []
+    try:
+        dict_turn_metadata = turn_metadata_json_to_dict(notebook['turn_metadata'])
+        correct_turn_metadata = compare_consecutive_metadata_items(dict_turn_metadata)
+        
+        conflicting_instructions = find_conflicting_instructions(dict_turn_metadata)
+        issues_in_keys_against_template = validate_keys_against_template(template_json, dict_turn_metadata)
+        issues_in_instruction_kwargs_datatype = validate_instruction_kwargs_datatype(dict_turn_metadata)
+
+        logs.append(f'CONFLICTING INSTRUCTIONS FOUND - {conflicting_instructions}')
+        logs.append(f'INSTRUCTION ARGUMENT MISMATCHES IN TURN JSON - {issues_in_keys_against_template}')
+        logs.append(f'VALIDATING JSON SCHEMA - {issues_in_instruction_kwargs_datatype}')
+
+        i, flag = 1, False
+        for t, f in zip(correct_turn_metadata, dict_turn_metadata):
+            if t['metadata'] != f['metadata']:
+                logs.append(f"TURN {i} METADATA SHOULD BE {t['metadata']}, BUT IS {f['metadata']}")
+                flag = True
+            i += 1
+        if not flag:
+            logs.append("TURN METADATA IS CORRECT")
+            if any([conflicting_instructions, issues_in_keys_against_template, issues_in_instruction_kwargs_datatype]):
+                logs.append('False')
+            else:
+                logs.append('True')
+        else:
+            logs.append('False')
+    except Exception as e:
+        logs.append(f'Some error occurred while validating the notebook - {e}')
+    finally:
+        with open(log_filename, "w", encoding="utf-8") as f:
+            f.writelines(line + '\n' for line in logs)
+
+
+def turn_metadata_json_to_dict(turn_metadata):
+    parsed_json_metadata = []
+    for item in turn_metadata:
+        # Extract the JSON block between triple backticks
+        match = re.search(r"```(?:\w+)?\n(.*?)```", item, re.DOTALL)
+        if match:
+            json_str = match.group(1).strip()
+            # Parse the JSON string into a dictionary
+            data = json.loads(json_str)
+            data['metadata'] = set(data['metadata'])
+            parsed_json_metadata.append(data)
+        else:
+            raise "No JSON found in item."
+    return parsed_json_metadata
+
+
+def compare_consecutive_metadata_items(dict_turn_metadata):
+    def to_dict(instructions):
+        return {instr['instruction_id']: instr for instr in instructions}
+
+    updated = []
+
+    for idx, current_turn in enumerate(dict_turn_metadata):
+        if idx == 0:
+            updated.append(copy.deepcopy(current_turn))  # Keep the first as-is
+            continue
+
+        prev_instr = to_dict(dict_turn_metadata[idx - 1]['instructions'])
+        curr_instr = to_dict(current_turn['instructions'])
+
+        metadata = set()
+
+        # Check for additions and modifications
+        for instr_id, instr in curr_instr.items():
+            if instr_id not in prev_instr:
+                print(idx + 1, 'Added', instr_id)
+                metadata.add("add")
+            elif instr != prev_instr[instr_id]:
+                print(idx + 1, 'Modified', instr_id)
+                metadata.add("modify")
+
+        # Check for removals
+        for instr_id in prev_instr:
+            if instr_id not in curr_instr:
+                print(idx + 1, 'Removed', instr_id)
+                metadata.add("remove")
+
+        # Avoid duplicates
+        current_copy = copy.deepcopy(current_turn)
+        current_copy['metadata'] = metadata
+        updated.append(current_copy)
+
+    return updated
+
+
+def find_conflicting_instructions(dict_turn_metadata):
+    conflicts_found = []
+
+    for data in dict_turn_metadata:
+        instruction_ids = {instr["instruction_id"] for instr in data.get("instructions", [])}
+        current_conflicts = []
+
+        for instr_id in instruction_ids:
+            if instr_id in conflict_dict:
+                for conflicting_id in conflict_dict[instr_id]:
+                    if conflicting_id in instruction_ids:
+                        pair = tuple(sorted((instr_id, conflicting_id)))
+                        if pair not in current_conflicts:
+                            current_conflicts.append(pair)
+
+        if current_conflicts:
+            conflicts_found.append(current_conflicts)
+
+    return conflicts_found
+
+
+def validate_keys_against_template(template_json, dict_turn_metadata):
+    # Map template instruction_id to expected key set
+    template_keys = {
+        instr["instruction_id"]: set(instr.keys())
+        for instr in template_json.get("instructions", [])
+    }
+    idx, res = 1, []
+
+    for input_json in dict_turn_metadata:
+        mismatches = {}
+
+        # Check each instruction in input_json
+        for instr in input_json.get("instructions", []):
+            instr_id = instr.get("instruction_id")
+            input_keys = set(instr.keys())
+
+            if instr_id not in template_keys:
+                mismatches[instr_id] = {
+                    "error": "instruction_id not in template"
+                }
+            elif input_keys != template_keys[instr_id]:
+                mismatches[instr_id] = {
+                    "missing_keys": list(template_keys[instr_id] - input_keys),
+                    "extra_keys": list(input_keys - template_keys[instr_id])
+                }
+        res.append({f"TURN {idx}": mismatches}) if mismatches else ''
+        idx += 1
+    return res
+
+
+def validate_instruction_kwargs_datatype(dict_turn_metadata):
+    def is_valid_str(val):
+        return isinstance(val, str)
+
+    def is_valid_int(val):
+        return isinstance(val, int)
+
+    def is_valid_list_str(val):
+        return isinstance(val, list) and all(isinstance(i, str) for i in val)
+
+    def is_valid_relation(val):
+        return val in valid_relations
+
+    valid_relations = {"at least", "equal to", "less than"}
+    turn, issues = 1, []
+
+    for data in dict_turn_metadata:
+        errors = []
+
+        # Check metadata
+        if not isinstance(data.get("metadata"), set) or not all(isinstance(item, str) for item in data["metadata"]):
+            errors.append("metadata must be a list of strings.")
+
+        # Check instructions
+        instructions = data.get("instructions", [])
+        if not isinstance(instructions, list):
+            errors.append("instructions must be a list.")
+            return errors
+
+        for idx, inst in enumerate(instructions):
+            if not isinstance(inst, dict):
+                errors.append(f"Instruction at index {idx} is not a dict.")
+                continue
+
+            iid = inst.get("instruction_id")
+            if not iid or not isinstance(iid, str):
+                errors.append(f"Missing or invalid instruction_id at index {idx}")
+                continue
+
+            def add_error(field, expected_type):
+                errors.append(f"{iid}: '{field}' must be {expected_type}")
+
+            # Validate per instruction_id
+            if iid == "length_constraints:number_characters":
+                if not is_valid_relation(inst.get("relation")):
+                    add_error("relation", "one of 'at least', 'equal to', 'less than'")
+                if not is_valid_int(inst.get("num_chars")):
+                    add_error("num_chars", "int")
+
+            elif iid == "keywords:existence":
+                if not is_valid_list_str(inst.get("keywords")):
+                    add_error("keywords", "list of str")
+
+            elif iid == "detectable_format:numbered_list":
+                if not is_valid_relation(inst.get("relation")):
+                    add_error("relation", "valid relation")
+                if not is_valid_int(inst.get("num_numbered_items")):
+                    add_error("num_numbered_items", "int")
+
+            elif iid == "keywords:frequency":
+                if not is_valid_str(inst.get("keyword")):
+                    add_error("keyword", "str")
+                if not is_valid_relation(inst.get("relation")):
+                    add_error("relation", "valid relation")
+                if not is_valid_int(inst.get("frequency")):
+                    add_error("frequency", "int")
+
+            elif iid == "length_constraints:number_words":
+                if not is_valid_relation(inst.get("relation")):
+                    add_error("relation", "valid relation")
+                if not is_valid_int(inst.get("num_words")):
+                    add_error("num_words", "int")
+
+            elif iid in {
+                "change_case:all_caps_target",
+                "change_case:lowercase_target",
+                "startend:wrap_checker",
+                "change_case:alternating_target",
+                "startend:end_checker",
+                "change_case:first_letter_cap_target",
+                "detectable_content:postscript",
+                "startend:start_checker"
+            }:
+                if not is_valid_str(
+                        inst.get("target_string") or inst.get("wrap_phrase") or inst.get("end_phrase") or inst.get(
+                            "start_phrase") or inst.get("postscript_marker")):
+                    add_error("target_string/wrap_phrase/etc", "str")
+
+            elif iid == "keywords:forbidden_words":
+                if not is_valid_list_str(inst.get("forbidden_words")):
+                    add_error("forbidden_words", "list of str")
+
+            elif iid == "change_case:lowercase_word_frequency":
+                if not is_valid_relation(inst.get("lowercase_relation")):
+                    add_error("lowercase_relation", "valid relation")
+                if not is_valid_int(inst.get("lowercase_frequency")):
+                    add_error("lowercase_frequency", "int")
+
+            elif iid == "keywords:letter_frequency":
+                if not is_valid_str(inst.get("letter")):
+                    add_error("letter", "str")
+                if not is_valid_relation(inst.get("let_relation")):
+                    add_error("let_relation", "valid relation")
+                if not is_valid_int(inst.get("let_frequency")):
+                    add_error("let_frequency", "int")
+
+            elif iid == "change_case:capital_word_frequency":
+                if not is_valid_relation(inst.get("capital_relation")):
+                    add_error("capital_relation", "valid relation")
+                if not is_valid_int(inst.get("capital_frequency")):
+                    add_error("capital_frequency", "int")
+
+            elif iid == "detectable_format:multiple_sections":
+                if not is_valid_str(inst.get("section_splitter")):
+                    add_error("section_splitter", "str")
+                if not is_valid_relation(inst.get("relation")):
+                    add_error("relation", "valid relation")
+                if not is_valid_int(inst.get("num_sections")):
+                    add_error("num_sections", "int")
+
+            elif iid == "detectable_format:number_bullet_lists":
+                if not is_valid_relation(inst.get("relation")):
+                    add_error("relation", "valid relation")
+                if not is_valid_int(inst.get("num_bullets")):
+                    add_error("num_bullets", "int")
+
+            elif iid == "detectable_content:number_placeholders":
+                if not is_valid_relation(inst.get("relation")):
+                    add_error("relation", "valid relation")
+                if not is_valid_int(inst.get("num_placeholders")):
+                    add_error("num_placeholders", "int")
+
+            else:
+                # for simple instructions with just instruction_id
+                if len(inst) > 1:
+                    errors.append(f"{iid}: should not contain incorrect/extra fields")
+
+        issues.append({f'TURN {turn}': errors}) if errors else ''
+        turn += 1
+    return issues
+
+def analyze_instruction_statuses_by_turn(data):
+    results_per_turn, frontier_fail_rates = [], []
+    task_fail, nova_fail, resp = False, None, []
+
+    for item in data:
+        turn_index = item.get('turn_index')
+        response_type = item.get('response_type')
+        results = item.get('results', [])
+
+        passed = sum(r.get('status') == 'Passed' for r in results)
+        failed = sum(r.get('status') == 'Failed' for r in results)
+        total = passed + failed
+
+        results_per_turn.append({
+            'turn_index': turn_index,
+            'response_type': response_type,
+            'total': total,
+            'passed': passed,
+            'failed': failed
+        })
+
+        if response_type == 'response' and failed > 0:
+            resp.append(f'❗ NON FINAL TURN {turn_index} FAILING ON {failed} INSTRUCTIONS ❗')
+            task_fail = True
+
+        if total > 0:
+            fail_rate = round(failed * 100 / total)
+            if response_type == 'nova_response':
+                nova_fail = fail_rate
+            elif response_type.endswith('_response'):
+                frontier_fail_rates.append(fail_rate)
+
+    frontier_fail = round(sum(frontier_fail_rates) / len(frontier_fail_rates)) if frontier_fail_rates else 0
+
+    # Classification logic
+    if nova_fail is not None and nova_fail >= 50:
+        if frontier_fail >= 80:
+            classification = 'EXPERT'
+        elif frontier_fail >= 50:
+            classification = 'HARD'
+        else:
+            classification = 'MEDIUM'
+    else:
+        classification, task_fail = 'N/A', True
+
+    resp.append(f"Nova Fail: {nova_fail}%, Frontier Fail: {frontier_fail}%")
+    result = {'task_fail': task_fail, 'text': resp, 'results_per_turn': results_per_turn, 'classification': classification}
+    return result

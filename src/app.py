@@ -4,8 +4,9 @@ import json
 from pathlib import Path
 import tempfile
 from main import run_validation, run_batch_processing
-from validators.validator import validate_instruction, check_contradicting_instructions, CONTRADICTING_PAIRS
+from validators.validator import validate_instruction, check_contradicting_instructions, analyze_instruction_statuses_by_turn
 import requests
+from data_loader import conflict_dict
 
 st.set_page_config(
     page_title="Turing Amazon Task Parser VIF",
@@ -48,15 +49,15 @@ def main():
     st.title("Turing Amazon Task Parser VIF")
     st.markdown("Process and validate Jupyter notebooks containing Turing Amazon task data.")
     # Tabs
-    tab2, tab1, tab3 = st.tabs([
+    tab1, tab2, tab3 = st.tabs([
         "Validation (Single Turn)",
         "Validation (Batch/Notebook)",
         "Nova (Conversation)",
     ])
     with tab1:
-        show_batch_processing()
-    with tab2:
         show_single_cell_validation()
+    with tab2:
+        show_batch_processing()
     with tab3:
         st.subheader("Nova Model: Conversation Test & Validation")
         st.markdown("Test a prompt against the Nova model and validate the result.")
@@ -95,13 +96,37 @@ def show_batch_processing():
                         result_dir = os.path.join(temp_dir, base_name)
                         
                         if os.path.exists(result_dir):
-                            st.subheader(f"Validation Report for {uploaded_file.name}")
+                            st.subheader(f"Validation Report for {uploaded_file.name}\n")
                             
+                            st.subheader("REPORT")
+                            notebook_validation = os.path.join(result_dir, "notebook_validation.log")
+                            if os.path.exists(notebook_validation):
+                                with open(notebook_validation, 'r', encoding='utf-8') as f:
+                                    log_content = f.read()
+                                log_content = log_content.split('\n')
+                                initial_check = True if 'True' in log_content else False
+                                st.text('\n'.join(log_content[:-2]))
+
                             # Display validation report
                             validation_path = os.path.join(result_dir, "validation_report.json")
                             if os.path.exists(validation_path):
                                 with open(validation_path, 'r', encoding='utf-8') as f:
                                     validation_data = json.load(f)
+                                task_data = analyze_instruction_statuses_by_turn(validation_data)
+
+                                st.subheader("Classification Summary")
+                                for line in task_data['text']:
+                                    st.markdown(f"- {line}")
+                                st.markdown(f'Task Classification: {task_data["classification"]}')
+
+                                if initial_check and not task_data['task_fail']:
+                                    st.markdown(f"✅ PRELIMINARY CHECKS PASSED")
+                                else:
+                                    st.markdown(f"❌ PRELIMINARY CHECKS FAILED")
+
+                                st.subheader("Results Per Turn")
+                                st.table(task_data['results_per_turn'])
+                                st.subheader("Detailed report")
                                 st.json(validation_data)
                             # Display metadata change report
                             metadata_report_path = os.path.join(result_dir, "metadata_change_report.json")
@@ -215,12 +240,12 @@ def show_single_cell_validation():
     # Add button to show contradicting pairs
     if st.button("Show Contradicting Instruction Pairs"):
         pairs = []
-        for pair in CONTRADICTING_PAIRS:
-            pair_list = list(pair)
-            if len(pair_list) == 2:
-                pairs.append({"Instruction 1": pair_list[0], "Instruction 2": pair_list[1]})
-            elif len(pair_list) == 1:
-                pairs.append({"Instruction 1": pair_list[0], "Instruction 2": ""})
+        for instr, conflicting_list in conflict_dict.items():
+            if conflicting_list:
+                for conflict in conflicting_list:
+                    pairs.append({"Instruction 1": instr, "Instruction 2": conflict})
+            else:
+                pairs.append({"Instruction 1": instr, "Instruction 2": ""})
         st.markdown("#### Contradicting Instruction Pairs")
         st.table(pairs)
 

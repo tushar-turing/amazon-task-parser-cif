@@ -1,25 +1,187 @@
-import json
-from pathlib import Path
+template_json = {
+    "metadata": [
+        "add", "modify", "remove"
+    ],
+    "instructions": [
+        {
+            "instruction_id": "detectable_format:json_format"
+        },
+        {
+            "instruction_id": "length_constraints:number_characters",
+            "relation": "{at least, equal to, less than}",
+            "num_chars": "int"
+        },
+        {
+            "instruction_id": "keywords:existence",
+            "keywords": "list(str)"
+        },
+        {
+            "instruction_id": "detectable_format:numbered_list",
+            "relation": "{at least, equal to, less than}",
+            "num_numbered_items": "int"
+        },
+        {
+            "instruction_id": "change_case:alternating"
+        },
+        {
+            "instruction_id": "keywords:frequency",
+            "keyword": "str",
+            "relation": "{at least, equal to, less than}",
+            "frequency": "int"
+        },
+        {
+            "instruction_id": "length_constraints:number_words",
+            "relation": "{at least, equal to, less than}",
+            "num_words": "int"
+        },
+        {
+            "instruction_id": "change_case:all_caps_target",
+            "target_string": "str"
+        },
+        {
+            "instruction_id": "change_case:lowercase_target",
+            "target_string": "str"
+        },
+        {
+            "instruction_id": "keywords:forbidden_words",
+            "forbidden_words": "list(str)"
+        },
+        {
+            "instruction_id": "startend:wrap_checker",
+            "wrap_phrase": "str"
+        },
+        {
+            "instruction_id": "detectable_format:multiple_sections",
+            "section_splitter": "str",
+            "relation": "{at least, equal to, less than}",
+            "num_sections": "int"
+        },
+        {
+            "instruction_id": "punctuation:no_comma"
+        },
+        {
+            "instruction_id": "change_case:alternating_target",
+            "target_string": "str"
+        },
+        {
+            "instruction_id": "change_case:lowercase_word_frequency",
+            "lowercase_relation": "{at least, equal to, less than}",
+            "lowercase_frequency": "int"
+        },
+        {
+            "instruction_id": "change_case:lowercase"
+        },
+        {
+            "instruction_id": "keywords:letter_frequency",
+            "letter": "str",
+            "let_relation": "{at least, equal to, less than}",
+            "let_frequency": "int"
+        },
+        {
+            "instruction_id": "change_case:all_caps"
+        },
+        {
+            "instruction_id": "startend:quotation"
+        },
+        {
+            "instruction_id": "change_case:capital_word_frequency",
+            "capital_relation": "{at least, equal to, less than}",
+            "capital_frequency": "int"
+        },
+        {
+            "instruction_id": "detectable_format:title"
+        },
+        {
+            "instruction_id": "startend:end_checker",
+            "end_phrase": "str"
+        },
+        {
+            "instruction_id": "change_case:first_letter_cap_target",
+            "target_string": "str"
+        },
+        {
+            "instruction_id": "detectable_format:number_bullet_lists",
+            "relation": "{at least, equal to, less than}",
+            "num_bullets": "int"
+        },
+        {
+            "instruction_id": "detectable_content:postscript",
+            "postscript_marker": "str"
+        },
+        {
+            "instruction_id": "detectable_content:number_placeholders",
+            "relation": "{at least, equal to, less than}",
+            "num_placeholders": "int"
+        },
+        {
+            "instruction_id": "startend:start_checker",
+            "start_phrase": "str"
+        },
+        {
+            "instruction_id": "change_case:first_letter_cap"
+        }
+    ]
+}
 
-# Define file paths using pathlib for cross-platform compatibility
-instruction_json_path = Path('instruction.json')
-conflicting_instructions_json_path = Path('conflicting_instructions.json')
-
-try:
-    # Read instruction.json
-    with instruction_json_path.open('r') as tfile:
-        template_json = json.load(tfile)
-
-    # Read conflicting_instructions.json
-    with conflicting_instructions_json_path.open('r') as file:
-        conflict_dict = json.load(file)
-
-    print("Files loaded successfully.")
-    # You can now use `template_json` and `conflict_dict` as needed
-
-except FileNotFoundError as e:
-    print(f"File not found: {e.filename}")
-except json.JSONDecodeError as e:
-    print(f"Invalid JSON in file: {e.msg} at line {e.lineno}, column {e.colno}")
-except Exception as e:
-    print(f"Unexpected error: {e}")
+conflict_dict = {
+    "change_case:all_caps": [
+        "change_case:lowercase",
+        "change_case:alternating",
+        "change_case:first_letter_cap",
+        "change_case:all_caps_target"
+    ],
+    "change_case:lowercase": [
+        "change_case:all_caps",
+        "change_case:alternating",
+        "change_case:first_letter_cap",
+        "change_case:lowercase_target"
+    ],
+    "change_case:alternating": [
+        "change_case:all_caps",
+        "change_case:lowercase",
+        "change_case:first_letter_cap",
+        "change_case:alternating_target"
+    ],
+    "change_case:first_letter_cap": [
+        "change_case:all_caps",
+        "change_case:lowercase",
+        "change_case:alternating",
+        "change_case:first_letter_cap_target"
+    ],
+    "change_case:all_caps_target": [
+        "change_case:all_caps"
+    ],
+    "change_case:lowercase_target": [
+        "change_case:lowercase"
+    ],
+    "change_case:alternating_target": [
+        "change_case:alternating"
+    ],
+    "change_case:first_letter_cap_target": [
+        "change_case:first_letter_cap"
+    ],
+    "detectable_format:title": [
+        "startend:quotation",
+        "startend:wrap_checker"
+    ],
+    "startend:quotation": [
+        "startend:wrap_checker",
+        "startend:start_checker",
+        "startend:end_checker",
+        "detectable_format:title"
+    ],
+    "startend:wrap_checker": [
+        "startend:quotation",
+        "startend:start_checker",
+        "startend:end_checker",
+        "detectable_format:title"
+    ],
+    "startend:start_checker": [
+        "startend:quotation",
+        "startend:wrap_checker"
+    ],
+    "startend:end_checker": [
+        "startend:quotation",
+        "startend:wrap_checker"
+    ]
+}

@@ -373,7 +373,7 @@ def extract_notebook_sections_as_dict(ipynb_path):
             result['task_metadata'].append(content)
             continue
 
-        match = re.search(r'\*\*\[(\w+)]\*\*', split_lines[0])
+        match = re.search(r'\*\*\[([\w.]+)]\*\*', split_lines[0])
         title = match.group(1)
 
         result[title].append('\n'.join(split_lines[1:]))

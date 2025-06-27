@@ -2,7 +2,8 @@ import os
 import sys
 import json
 from notebook_processing.processor import process_notebook, process_notebook_with_metadata_report
-from validators.validator import validate_instruction
+from validators.validator import validate_instruction, validate_notebook_schema, extract_notebook_sections_as_dict
+from data_loader import template_json
 
 def run_validation(input_json_path: str, output_log_path: str) -> None:
     """Run validation on the input JSON and save results to output path."""
@@ -67,6 +68,10 @@ def run_batch_processing(input_dir: str, output_base_dir: str) -> None:
         with open(converted_path, "w", encoding="utf-8") as f:
             json.dump(converted, f, indent=2, ensure_ascii=False)
         print(f"✅ Converted JSON saved to: {converted_path}")
+        
+        log_filename = os.path.join(output_dir, "notebook_validation.log")
+        notebook = extract_notebook_sections_as_dict(input_path)
+        validate_notebook_schema(notebook, template_json, log_filename)
 
         # Save metadata change report
         metadata_report_path = os.path.join(output_dir, "metadata_change_report.json")

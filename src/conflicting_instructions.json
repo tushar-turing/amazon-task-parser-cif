@@ -1,0 +1,62 @@
+{
+    "change_case:all_caps": [
+        "change_case:lowercase",
+        "change_case:alternating",
+        "change_case:first_letter_cap",
+        "change_case:all_caps_target"
+    ],
+    "change_case:lowercase": [
+        "change_case:all_caps",
+        "change_case:alternating",
+        "change_case:first_letter_cap",
+        "change_case:lowercase_target"
+    ],
+    "change_case:alternating": [
+        "change_case:all_caps",
+        "change_case:lowercase",
+        "change_case:first_letter_cap",
+        "change_case:alternating_target"
+    ],
+    "change_case:first_letter_cap": [
+        "change_case:all_caps",
+        "change_case:lowercase",
+        "change_case:alternating",
+        "change_case:first_letter_cap_target"
+    ],
+    "change_case:all_caps_target": [
+        "change_case:all_caps"
+    ],
+    "change_case:lowercase_target": [
+        "change_case:lowercase"
+    ],
+    "change_case:alternating_target": [
+        "change_case:alternating"
+    ],
+    "change_case:first_letter_cap_target": [
+        "change_case:first_letter_cap"
+    ],
+    "detectable_format:title": [
+        "startend:quotation",
+        "startend:wrap_checker"
+    ],
+    "startend:quotation": [
+        "startend:wrap_checker",
+        "startend:start_checker",
+        "startend:end_checker",
+        "detectable_format:title"
+    ],
+    "startend:wrap_checker": [
+        "startend:quotation",
+        "startend:start_checker",
+        "startend:end_checker",
+        "detectable_format:title"
+    ],
+    "startend:start_checker": [
+        "startend:quotation",
+        "startend:wrap_checker"
+    ],
+    "startend:end_checker": [
+        "startend:quotation",
+        "startend:wrap_checker"
+    ]
+}
